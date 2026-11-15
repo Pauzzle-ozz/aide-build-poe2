@@ -7,16 +7,18 @@ import react from '@vitejs/plugin-react';
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const API = `http://127.0.0.1:${process.env.POE2_PORT || 4747}`;
 
-/** Version en ligne : les données du jeu (data/*.json) sont publiées avec l'interface */
+/** Version en ligne : les données du jeu (data/*.json) et le skill à télécharger sont publiés avec l'interface */
 function copyGameData(outDir) {
   return {
     name: 'copier-donnees-du-jeu',
     apply: 'build',
-    writeBundle() {
+    async writeBundle() {
       const src = path.join(ROOT, 'data');
       const dest = path.join(outDir, 'data');
       fs.mkdirSync(dest, { recursive: true });
       for (const f of fs.readdirSync(src)) if (f.endsWith('.json')) fs.copyFileSync(path.join(src, f), path.join(dest, f));
+      const { creerZipSkill } = await import('./scripts/skill-zip.mjs');
+      fs.writeFileSync(path.join(outDir, 'expert-build-poe2.zip'), creerZipSkill());
     },
   };
 }

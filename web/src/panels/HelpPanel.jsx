@@ -41,6 +41,11 @@ export default function HelpPanel({ onClose, connected }) {
               du jeu en français, écrire les notes et piloter cette page (centrer l'arbre, surligner des passifs, afficher des messages).
               Gardez cette page ouverte pendant qu'il travaille : c'est elle qui détient vos builds. Ses modifications restent en brouillon jusqu'à ce que vous cliquiez sur « Valider ».
             </p>
+            <p>
+              Claude y suit la méthode du skill « Expert build » (synergies, dégâts, défenses, progression). Vous pouvez aussi{' '}
+              <a href="/expert-build-poe2.zip" download>télécharger ce skill</a> et l'ajouter dans Claude
+              (<a href="https://claude.ai/customize/skills" target="_blank" rel="noreferrer">claude.ai/customize/skills</a>, bouton « + ») pour l'avoir dans toutes vos conversations.
+            </p>
             <p className="small muted">
               Une <a href={REPO} target="_blank" rel="noreferrer">version à installer sur votre ordinateur</a> existe aussi, avec les builds enregistrés dans des fichiers.
             </p>

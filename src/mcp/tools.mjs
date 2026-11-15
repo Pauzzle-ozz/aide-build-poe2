@@ -7,6 +7,7 @@
 // src/core/search-routes.mjs et /api/ui), via la fonction `api` fournie.
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { registerGuide } from './guide.mjs';
 
 const q = (o) =>
   '?' +
@@ -14,6 +15,8 @@ const q = (o) =>
     .filter(([, v]) => v !== undefined && v !== null && v !== '')
     .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
     .join('&');
+
+const RAPPEL_METHODE = "Pour concevoir ou analyser ce build, suis la méthode du skill expert : guide_expert (sujet « methode » si ce n'est pas déjà fait, puis « ascendance » pour cette classe).";
 
 const ok = (data) => ({ content: [{ type: 'text', text: typeof data === 'string' ? data : JSON.stringify(data, null, 1) }] });
 const fail = (e) => ({ isError: true, content: [{ type: 'text', text: `Erreur : ${e.message || e}` }] });
@@ -50,12 +53,17 @@ function formatSummary(s) {
   return L.join('\n');
 }
 
+const METHODE =
+  "MÉTHODE : avant de concevoir, remplir, analyser ou corriger un build, et avant de répondre à une question sur les passifs, les gemmes, les ascendances, les dégâts ou les défenses, " +
+  "appelle guide_expert (sujet « methode », une fois par conversation), puis les fiches utiles (« ascendance » de la classe, « degats », « defenses », « progression »…), et applique ses règles. ";
+
 function instructions({ interfaceUrl, enLigne }) {
   const ouverte = `L'utilisateur voit une interface graphique de style jeu dans son navigateur (${interfaceUrl}) qui se met à jour en direct quand tu modifies un build. `;
   const onglet = enLigne
     ? "Ses builds sont enregistrés dans son navigateur : l'onglet du site doit rester ouvert pendant que tu travailles (sinon les outils renvoient une erreur qui l'explique). "
     : '';
   return (
+    METHODE +
     (enLigne ? "Outil de création de builds Path of Exile 2, entièrement en français. Les données (arbre passif, gemmes, objets) viennent de Path of Building PoE2 et de poe2db (FR). " : "Outil local de création de builds Path of Exile 2, entièrement en français. Les données (arbre passif, gemmes, objets) viennent de Path of Building PoE2 et de poe2db (FR). ") +
     ouverte +
     onglet +
@@ -64,7 +72,7 @@ function instructions({ interfaceUrl, enLigne }) {
 }
 
 /** Crée le serveur MCP. `api(méthode, url, corps)` renvoie la réponse JSON de l'API de l'outil. */
-export function createMcpServer({ api, interfaceUrl, openInterface = null, enLigne = false }) {
+export function createMcpServer({ api, interfaceUrl, openInterface = null, enLigne = false, lireGuide = null }) {
   async function ui(cmd) {
     try {
       return await api('POST', '/api/ui', cmd);
@@ -83,6 +91,8 @@ export function createMcpServer({ api, interfaceUrl, openInterface = null, enLig
       instructions: instructions({ interfaceUrl, enLigne }),
     },
   );
+
+  if (lireGuide) registerGuide(server, { lire: lireGuide, ok, fail });
 
   server.registerTool('etat_outil', {
     title: "État de l'outil",
@@ -113,7 +123,7 @@ export function createMcpServer({ api, interfaceUrl, openInterface = null, enLig
 
   server.registerTool('creer_build', {
     title: 'Créer un build',
-    description: "Crée un nouveau build (et l'affiche dans l'interface). Classe/ascendance en FR ou EN (ex : « Guerrier », « Titan », « Sorceress »).",
+    description: "Crée un nouveau build (et l'affiche dans l'interface). Classe/ascendance en FR ou EN (ex : « Guerrier », « Titan », « Sorceress »). Avant de le remplir : guide_expert (« methode », puis « ascendance »).",
     inputSchema: {
       nom: z.string().describe('Nom du build'),
       classe: z.string().describe('Classe ou ascendance (FR ou EN)'),
@@ -124,7 +134,7 @@ export function createMcpServer({ api, interfaceUrl, openInterface = null, enLig
     const b = await api('POST', '/api/builds', { name: nom, class: 'Warrior', level: niveau || 1, source: 'claude' });
     const r = await ops(b.id, [{ op: 'setClass', class: classe, ascendancy: ascendance }]);
     await api('POST', `/api/builds/${b.id}/validate`);
-    return { id: r.build.id, nom: r.build.name, classe: r.build.class, ascendance: r.build.ascendancy, niveau: r.build.level };
+    return { id: r.build.id, nom: r.build.name, classe: r.build.class, ascendance: r.build.ascendancy, niveau: r.build.level, methode: RAPPEL_METHODE };
   }));
 
   server.registerTool('ouvrir_build', {
@@ -135,12 +145,12 @@ export function createMcpServer({ api, interfaceUrl, openInterface = null, enLig
 
   server.registerTool('lire_build', {
     title: 'Lire un build',
-    description: "Résumé complet d'un build : classe, points, attributs, clés de voûte, notables, gemmes, équipement, statistiques cumulées, notes. Sans 'build' : le build actif.",
+    description: "Résumé complet d'un build : classe, points, attributs, clés de voûte, notables, gemmes, équipement, statistiques cumulées, notes. Sans 'build' : le build actif. Pour l'analyser : guide_expert.",
     inputSchema: {
       build: z.string().optional().describe('Id ou nom (défaut : build actif)'),
       langue: z.enum(['fr', 'en']).optional().describe('fr par défaut ; en pour avoir les textes anglais'),
     },
-  }, tool(async ({ build, langue }) => formatSummary(await api('GET', `/api/builds/${encodeURIComponent(build || 'active')}/summary${q({ lang: langue })}`))));
+  }, tool(async ({ build, langue }) => formatSummary(await api('GET', `/api/builds/${encodeURIComponent(build || 'active')}/summary${q({ lang: langue })}`)) + `\n\n---\n${RAPPEL_METHODE}`));
 
   server.registerTool('modifier_build', {
     title: 'Modifier un build',

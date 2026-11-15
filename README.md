@@ -121,29 +121,44 @@ src/core/           logique partagée navigateur / serveur : arbre, stats, modè
                     stockage des builds (build-store), routes de l'API (build-routes, search-routes),
                     conversion PoB, glossaire
 src/server/         serveur local : Express, WebSocket temps réel, fichiers builds/*.json
-src/mcp/            outils MCP pour Claude (tools.mjs, partagés) ; server.mjs = serveur MCP local (stdio)
+src/mcp/            outils MCP pour Claude (tools.mjs, guide.mjs = skill expert, partagés) ; server.mjs = serveur MCP local (stdio)
 web/                interface React (Vite) ; web/src/web/ = version en ligne (builds dans le navigateur, relais Claude)
-cloudflare/         Worker de la version en ligne : icônes poe2db, liens PoB, serveur MCP en ligne et relais
+cloudflare/         Worker de la version en ligne (serveur MCP, relais, skill embarqué) + code partagé avec functions/
+functions/          fonctions Cloudflare Pages du site (icônes poe2db, liens PoB, transmission vers le Worker)
 ```
 
 Mode développement (rechargement à chaud) : `npm run dev`.
 
 ## Version en ligne (Cloudflare)
 
+Site : **https://aide-build-poe2.pages.dev**
+
 `npm run build:web` construit dans `web/dist-web` une version sans serveur : l'API des builds tourne dans le
 navigateur (mêmes routes que le serveur local) et **chaque visiteur garde ses builds dans son navigateur**
 (localStorage), avec sauvegarde/restauration dans un fichier depuis « Mes builds ».
 
 **Claude en ligne** : le bouton « ✦ Claude » donne à chaque navigateur un lien personnel secret
-`https://<site>/mcp/<jeton>`, à ajouter dans Claude comme connecteur personnalisé (réglages → Connecteurs).
-Le Worker y sert les mêmes outils que le serveur MCP local (`src/mcp/tools.mjs`) ; chaque appel est relayé
-par un Durable Object (`SessionClaude`, un par lien) vers l'onglet du site, par WebSocket (`/relais/<jeton>`),
-et exécuté sur les builds du navigateur. L'onglet doit donc rester ouvert pendant que Claude travaille.
+`https://aide-build-poe2.pages.dev/mcp/<jeton>`, à ajouter dans Claude comme connecteur personnalisé.
+Les outils sont ceux du serveur MCP local (`src/mcp/tools.mjs`) ; chaque appel est relayé par un Durable Object
+(`SessionClaude`, un par lien) vers l'onglet du site, par WebSocket (`/relais/<jeton>`), et exécuté sur les builds
+du navigateur. L'onglet doit donc rester ouvert pendant que Claude travaille.
 
-Déploiement **Cloudflare Workers** (configuration dans `wrangler.jsonc`) : projet relié au dépôt GitHub,
-nom `aide-build-poe2` (le même que dans `wrangler.jsonc`), Build command `npm run build:web`,
-Deploy command `npx wrangler deploy`, Path `/`. Chaque `git push` sur `main` republie le site.
-Test en local : `npm run build:web` puis `npx wrangler dev`.
+**Skill expert** : l'outil MCP `guide_expert` (`src/mcp/guide.mjs`) donne à Claude le contenu du skill
+`.claude/skills/expert-build-poe2/` par morceaux, en local comme en ligne ; les consignes du serveur MCP lui
+demandent de le consulter avant tout travail sur un build. Le site propose aussi le skill à télécharger
+(`/expert-build-poe2.zip`, généré par `scripts/skill-zip.mjs`) pour l'importer dans Claude
+(claude.ai/customize/skills).
+
+Deux projets Cloudflare, reliés au même dépôt GitHub (chaque `git push` sur `main` republie les deux) :
+
+| Projet | Rôle | Réglages dans le tableau de bord |
+|---|---|---|
+| Pages `aide-build-poe2` | le site + `functions/` (icônes, liens PoB, transmission de `/mcp` et `/relais`) ; configuration `wrangler.jsonc` | Build command `npm run build:web`, output `web/dist-web` |
+| Worker `aide-build-poe2-claude` | serveur MCP + relais (`cloudflare/`), sans adresse publique, joint par la liaison de service `OUTILS` ; configuration `cloudflare/wrangler.jsonc` | Deploy command `npx wrangler deploy --config cloudflare/wrangler.jsonc` |
+
+Les deux noms doivent rester différents (sinon la liaison de service du site boucle sur lui-même).
+Test en local : `npm run build:web`, puis `npx wrangler dev --config cloudflare/wrangler.jsonc` et, dans un autre
+terminal, `npx wrangler pages dev`.
 
 ## Traductions
 

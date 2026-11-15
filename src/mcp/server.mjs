@@ -3,11 +3,13 @@
 //
 // Il communique avec le serveur local (http://localhost:4747), qu'il démarre si besoin.
 // Les outils eux-mêmes sont dans src/mcp/tools.mjs (partagés avec la version en ligne).
+import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createMcpServer } from './tools.mjs';
+import { SKILL_DIR } from './guide.mjs';
 
 // stdout est réservé au protocole MCP
 console.log = (...a) => console.error(...a);
@@ -67,7 +69,10 @@ async function openInterface() {
   return `Interface ouverte : ${URL_INTERFACE}`;
 }
 
-const server = createMcpServer({ api, interfaceUrl: URL_INTERFACE, openInterface });
+// skill expert-build-poe2, lu à chaque appel de guide_expert (toujours à jour)
+const lireGuide = (fichier) => fs.readFileSync(path.join(ROOT, SKILL_DIR, fichier), 'utf8');
+
+const server = createMcpServer({ api, interfaceUrl: URL_INTERFACE, openInterface, lireGuide });
 const transport = new StdioServerTransport();
 await server.connect(transport);
 ensureServer().catch((e) => console.error(e.message));

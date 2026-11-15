@@ -1,0 +1,21 @@
+// Worker Cloudflare « aide-build-poe2-claude » : serveur MCP pour Claude (/mcp/<jeton>) et relais vers l'onglet
+// du site (/relais/<jeton>). Le site est servi par Cloudflare Pages (https://aide-build-poe2.pages.dev,
+// configuration : wrangler.jsonc à la racine), qui transmet ces adresses au Worker (liaison de service OUTILS).
+// Projet Worker dans le tableau de bord : Deploy command = npx wrangler deploy --config cloudflare/wrangler.jsonc
+// (le nom du Worker doit être « aide-build-poe2-claude », différent de celui du projet Pages).
+// Pas d'adresse publique *.workers.dev : il n'est joignable que par le site.
+{
+  "name": "aide-build-poe2-claude",
+  "workers_dev": false,
+  "preview_urls": false,
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-01",
+  "vars": { "SITE": "https://aide-build-poe2.pages.dev" },
+  // le skill expert-build-poe2 (fichiers .md) est embarqué tel quel pour l'outil guide_expert
+  "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
+  // relais entre Claude (connecteur MCP) et l'onglet du site : un par lien personnel
+  "durable_objects": {
+    "bindings": [{ "name": "SESSIONS", "class_name": "SessionClaude" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionClaude"] }]
+}

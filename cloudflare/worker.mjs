@@ -1,15 +1,15 @@
-// Worker Cloudflare de la version en ligne (configuration : wrangler.jsonc).
-// Cloudflare sert d'abord les fichiers de web/dist-web (interface, données du jeu, images) ;
-// ce code ne reçoit que les adresses qui ne correspondent à aucun fichier :
-//   /img                icônes poe2db (cache)
-//   /api/pob-url        liens de partage Path of Building
+// Worker Cloudflare de la version en ligne (configuration : wrangler.jsonc). Le site lui-même est servi
+// par Cloudflare Pages (https://aide-build-poe2.pages.dev, dossier functions/), qui transmet ici, par la
+// liaison de service OUTILS, ce qui demande un relais permanent :
 //   /mcp/<jeton>        serveur MCP pour Claude (connecteur personnalisé, lien personnel du visiteur)
 //   /relais/<jeton>     WebSocket ouvert par l'onglet du site : relaie les demandes de Claude vers
 //                       le navigateur, où sont enregistrés les builds (web/src/web/claude.js)
+// Toute autre adresse (ancienne adresse *.workers.dev) redirige vers le site.
 import { DurableObject } from 'cloudflare:workers';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { createMcpServer } from '../src/mcp/tools.mjs';
 import { handleImg, handlePobUrl } from './handlers.mjs';
+import { lireGuide } from './skill.mjs';
 
 const JETON = '([a-f0-9]{32})';
 const RELAIS = new RegExp(`^/relais/${JETON}$`);
@@ -90,11 +90,11 @@ export class SessionClaude extends DurableObject {
 }
 
 /** Serveur MCP sans session : chaque requête de Claude est traitée seule, les outils passent par le relais */
-async function serveurMcp(request, env, jeton, origine) {
+async function serveurMcp(request, env, jeton) {
   // pas de flux d'évènements (GET) ni de session à fermer (DELETE) : autorisé par le protocole
   if (request.method !== 'POST') return new Response(null, { status: 405, headers: { Allow: 'POST' } });
   const relais = env.SESSIONS.get(env.SESSIONS.idFromName(jeton));
-  const server = createMcpServer({ api: (method, url, body) => relais.appeler(method, url, body), interfaceUrl: origine, enLigne: true });
+  const server = createMcpServer({ api: (method, url, body) => relais.appeler(method, url, body), interfaceUrl: env.SITE, enLigne: true, lireGuide });
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
   await server.connect(transport);
   return transport.handleRequest(request);
@@ -112,7 +112,8 @@ export default {
       if (request.headers.get('Origin') !== url.origin) return new Response('Origine refusée', { status: 403 });
       return env.SESSIONS.get(env.SESSIONS.idFromName(m[1])).fetch(request);
     }
-    if ((m = pathname.match(MCP))) return serveurMcp(request, env, m[1], url.origin);
-    return env.ASSETS.fetch(request);
+    if ((m = pathname.match(MCP))) return serveurMcp(request, env, m[1]);
+    // le site est sur Cloudflare Pages
+    return Response.redirect(new URL(pathname + url.search, env.SITE).href, 301);
   },
 };

@@ -115,6 +115,23 @@ function ClaudeModal({ st, mod, statut, onClose, showToast }) {
               <p className="small muted">Dernière action de Claude : {new Date(st.derniereAction).toLocaleTimeString('fr-FR')}.</p>
             )}
 
+            <div className="section-title">4. Conseillé : ajoutez le skill « Expert build »</div>
+            <p>
+              Le skill apprend à Claude la méthode d'un expert : synergies, calcul des dégâts, défenses, progression du niveau 1 aux cartes.
+              Avec le connecteur, Claude la consulte déjà de lui-même ; ajouté dans Claude, le skill sert aussi dans toutes vos autres conversations.
+            </p>
+            <div className="row wrap" style={{ gap: 8, alignItems: 'center' }}>
+              <a className="btn small" href="/expert-build-poe2.zip" download>Télécharger le skill (.zip)</a>
+              <span className="small muted">
+                puis sur <a href="https://claude.ai/customize/skills" target="_blank" rel="noreferrer">claude.ai/customize/skills</a> : bouton « + », importez
+                le fichier tel quel (sans le décompresser) et activez le skill.
+              </span>
+            </div>
+            <p className="small muted">
+              L'import de skills dépend de votre abonnement Claude (exécution de code activée). Claude Code : décompressez le fichier dans le dossier
+              <code> ~/.claude/skills/</code>.
+            </p>
+
             <div className="row wrap" style={{ gap: 6, justifyContent: 'flex-end', marginTop: 10 }}>
               <button className="btn small" onClick={changerLien} title="Si vous avez partagé votre lien par erreur">Changer de lien</button>
               <button className="btn small danger" onClick={() => mod.desactiver()}>Désactiver</button>

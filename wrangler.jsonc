@@ -1,17 +1,10 @@
-// Version en ligne sur Cloudflare Workers (adresse gratuite *.workers.dev).
-// Dans le tableau de bord : Build command = npm run build:web, Deploy command = npx wrangler deploy.
-// Le nom du Worker dans le tableau de bord doit être le même que « name » ci-dessous.
+// Site en ligne sur Cloudflare Pages (https://aide-build-poe2.pages.dev).
+// Projet Pages dans le tableau de bord : Build command = npm run build:web (le reste vient de ce fichier).
+// Les fonctions du dossier functions/ transmettent /mcp et /relais au Worker « aide-build-poe2-claude »
+// (configuration : cloudflare/wrangler.jsonc) par la liaison de service OUTILS.
 {
   "name": "aide-build-poe2",
-  "main": "cloudflare/worker.mjs",
+  "pages_build_output_dir": "./web/dist-web",
   "compatibility_date": "2026-09-01",
-  "assets": {
-    "directory": "./web/dist-web",
-    "binding": "ASSETS"
-  },
-  // relais entre Claude (connecteur MCP) et l'onglet du site : un par lien personnel
-  "durable_objects": {
-    "bindings": [{ "name": "SESSIONS", "class_name": "SessionClaude" }]
-  },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionClaude"] }]
+  "services": [{ "binding": "OUTILS", "service": "aide-build-poe2-claude" }]
 }
