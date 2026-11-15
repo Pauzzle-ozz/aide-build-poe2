@@ -1,0 +1,322 @@
+{
+  "id": "qjvmjdsghqt4",
+  "name": "Moine Foudre 3/4 — Niv. 30 à 50 (Évocateur)",
+  "createdAt": "2026-11-14T22:35:18.136Z",
+  "updatedAt": "2026-11-15T01:00:39.103Z",
+  "class": "Monk",
+  "ascendancy": "Invoker",
+  "level": 50,
+  "tree": {
+    "nodes": [
+      10364,
+      44357,
+      17268,
+      55342,
+      63713,
+      7621,
+      17248,
+      53960,
+      49220,
+      8975,
+      4157,
+      21336,
+      36778,
+      61196,
+      34168,
+      62984,
+      36479,
+      58329,
+      56045,
+      13419,
+      31950,
+      56360,
+      11604,
+      630,
+      8569,
+      7405,
+      64643,
+      17088,
+      17548,
+      47177,
+      55507,
+      46034,
+      4850,
+      27176,
+      61834,
+      40760,
+      22359,
+      41029,
+      35503,
+      51741,
+      21779,
+      35760,
+      25557,
+      23764,
+      57821,
+      57204,
+      9141,
+      31765,
+      5703,
+      722,
+      36231,
+      15775,
+      3336,
+      11598,
+      30615,
+      44516,
+      65204,
+      2113,
+      326,
+      31449,
+      9444,
+      62841,
+      53941,
+      24165,
+      8908
+    ],
+    "attributes": {
+      "722": "Intelligence",
+      "8569": "Dexterity",
+      "8975": "Intelligence",
+      "11604": "Intelligence",
+      "15775": "Dexterity",
+      "17088": "Intelligence",
+      "17248": "Intelligence",
+      "24165": "Dexterity",
+      "25557": "Intelligence",
+      "31765": "Dexterity",
+      "31950": "Dexterity",
+      "41029": "Intelligence",
+      "46034": "Dexterity",
+      "47177": "Intelligence",
+      "51741": "Dexterity",
+      "53960": "Dexterity",
+      "55342": "Dexterity",
+      "56045": "Intelligence",
+      "57821": "Intelligence",
+      "58329": "Intelligence",
+      "61196": "Dexterity"
+    },
+    "weaponSet1": [],
+    "weaponSet2": []
+  },
+  "skills": [
+    {
+      "id": "b3s1",
+      "label": "Nettoyage (consomme les Charges de pouvoir)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemFallingThunder",
+          "level": 12,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemMagnifiedAreaSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAftershockChanceSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b3s2",
+      "label": "Cible unique + électrocution",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestFlurry",
+          "level": 12,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemLightningPenetrationSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemPracticedComboSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b3s3",
+      "label": "Générateur de Charges de pouvoir",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemSiphoningStrike",
+          "level": 12,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemEmpoweredSparksSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockConductionSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemCloseCombatSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b3s4",
+      "label": "Rares et boss",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestBell",
+          "level": 12,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemConcentratedAreaSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemElementalArmamentSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemIncreasedCriticalDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b3s5",
+      "label": "Buff : foudre sur toutes les attaques (niv. 31)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemChargedStaff",
+          "level": 12,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeightenedChargesSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemProlongedDurationSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b3s6",
+      "label": "Esprit",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeraldOfThunder",
+          "level": 10,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b3s7",
+      "label": "Esprit (défense)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemGhostDance",
+          "level": 12,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    }
+  ],
+  "items": {
+    "Weapon 1": {
+      "rarity": "RARE",
+      "name": "Fléau de l'orage",
+      "nameEn": "Fléau de l'orage",
+      "base": "Bâton de combat barbare",
+      "baseEn": "Barbarous Quarterstaff",
+      "baseId": "Barbarous_Quarterstaff",
+      "iconUrl": "https://cdn.poe2db.tw/image/Art/2DItems/Weapons/TwoHandWeapons/WarStaves/Warstaff03.webp",
+      "properties": [
+        "Dégâts Physiques: 42-71",
+        "Chances de Touche critique: 12%",
+        "Attaques par seconde: 1.4",
+        "Allonge: 1.4"
+      ],
+      "implicitsFr": [],
+      "implicits": [],
+      "explicitsFr": [
+        "Ajoute 3 à 84 Dégâts de Foudre",
+        "18% d'Augmentation de la Vitesse d'Attaque",
+        "+3.5% aux Chances de Touche critique"
+      ],
+      "explicits": [
+        "Adds 3 to 84 Lightning Damage",
+        "18% increased Attack Speed",
+        "+3.5% to Critical Hit Chance"
+      ]
+    }
+  },
+  "notes": "# Moine Foudre — étape 3/4 (niveaux 30 à 50)\n\n**Le principe :** le build passe aux Touches critiques. **Déchirez mes ennemis…** fait ignorer aux Touches critiques les Résistances élémentaires positives des ennemis, et **Bâton chargé** transforme les Charges de pouvoir en foudre sur toutes les attaques au Bâton de combat.\n\n## À faire en priorité\n1. **Ascendance : Chances de Critique → Déchirez mes ennemis…** à la 2ᵉ Épreuve.\n2. **Défense** : Scintillant et deux nœuds d'Évasion et Bouclier d'énergie sont maintenant dans l'arbre ; Foi intérieure arrive à l'étape 4/4. Portez de l'Évasion / Bouclier d'énergie avec de la Vie et des résistances (75 % visés avant les cartes).\n3. **Soutiens corrigés** : Héraut du tonnerre (Harmonie avec la foudre + Électrocution), Déluge céraunien (Harmonie avec la foudre à la place d'Innervation), Bâton chargé (Charges exaltées + Durée prolongée II).\n4. **Arme** : Bâton de combat avec le plus gros « Ajoute X à Y Dégâts de Foudre », de la Vitesse d'attaque et des Chances de Touche critique.\n\n## Ce qui a changé dans cette version (et pourquoi)\n- **Flammes résonnantes retirée** (le build n'Embrase jamais) ; Tonnerre résonnant repris par l'autre chemin : +10 % de Dégâts élémentaires pour le même coût.\n- **Surcharge et ses 3 nœuds de Pénétration retirés (4 points)** : la Pénétration ne fait jamais descendre une résistance sous 0 %, et avec Déchirez mes ennemis… vos Touches critiques ignorent déjà la résistance positive. Les 4 points vont dans la défense : **Scintillant** et deux nœuds **Évasion et Bouclier d'énergie** (sur le chemin de Foi intérieure).\n- **Héraut du tonnerre** : *Courant conducteur* (ne touche que les ennemis Trempés) et *Précision accrue II* (les éclairs du Héraut ignorent l'Évasion) ne faisaient rien → **Harmonie avec la foudre** + **Électrocution**.\n- **Déluge céraunien** : *Innervation* (il faut tuer un ennemi Électrocuté, rare contre un boss) → **Harmonie avec la foudre**.\n- **Bâton chargé** : il a bien des soutiens compatibles (l'ancienne note disait le contraire) → **Charges exaltées** (chance de doubler les bénéfices des Charges consommées) + **Durée prolongée II** (35 % Davantage de Durée).\n\n## Ascendance : Évocateur (4 points)\n**Je suis le Tonnerre…** (étape 2/4) puis **Déchirez mes ennemis…** : le plus gros gain de dégâts du build, et la raison de monter les Chances de Touche critique.\n\n## Esprit : 60\nAprès **Ignagduk** (Acte 3, +30 d'Esprit) : **Héraut du tonnerre** (30) + **Danse fantomatique** (30), même sans Matsya. Les soutiens ajoutés au Héraut ne coûtent pas d'Esprit supplémentaire.\n\n## Aptitudes et soutiens\n1. **Grondement de tonnerre** : Électrocution, Zone agrandie II, Réplique I.\n2. **Déluge céraunien** : Pénétration de la foudre (elle sert encore sur les coups non critiques), Harmonie avec la foudre, Enchaînement maîtrisé.\n3. **Frappe siphonnante** : Étincelles améliorées I, Électrocution propagée, Combat rapproché I.\n4. **Cloche tempétueuse** : Zone concentrée, Armement élémentaire II, Supercritique.\n5. **Bâton chargé** (niveau 31) : Charges exaltées, Durée prolongée II. Relancé pendant qu'il est actif, il prolonge sa durée ; avec **En harmonie avec la tempête**, chaque consommation compte une Charge de plus.\n6. **Héraut du tonnerre** : Harmonie avec la foudre, Électrocution.\n7. **Danse fantomatique**.\n\n## Arbre passif (61 points = 49 niveaux + 12 Points de Talent d'Ensemble d'armes)\n- **Pouvoir débordant** : +2 au nombre maximal de Charges de pouvoir (plus de charges pour Grondement de tonnerre et Bâton chargé).\n- **En harmonie avec la tempête** : les aptitudes de Bâton de combat qui consomment des Charges de pouvoir en comptent une de plus.\n- **Art martial**, **Prouesses critiques**, **Tonnerre résonnant**, **Courant alternatif**.\n- **Scintillant** + Évasion et Bouclier d'énergie : la défense de cette étape.\n\n## Comment jouer\n1. **Frappe siphonnante** sur un ennemi Électrocuté : Charges de pouvoir.\n2. **Bâton chargé** quand son Effet bénéfique va expirer (sinon gardez les charges pour Grondement de tonnerre).\n3. Meute : **Grondement de tonnerre** ; boss : **Déluge céraunien** puis **Cloche tempétueuse**.\nSignaux : si le Mana se vide, gardez Bâton chargé pour les boss ; si vous mourez sur de gros coups, priorité au Bouclier d'énergie et à la Vie sur l'équipement.\n\n## Au niveau 50\nPassez au build **4/4**, la version endgame.\n"
+}

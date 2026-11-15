@@ -1,0 +1,177 @@
+{
+  "skill_name": "expert-build-poe2",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "nouveau-build-debutant-chasseresse-lance",
+      "prompt": "je débute sur le jeu et je sais pas trop quoi jouer, j'aime bien l'idée de la chasseresse avec la lance. tu peux me faire un build du début jusqu'à la fin du jeu et m'expliquer pourquoi les passifs vont bien ensemble ?",
+      "expected_output": "Un build Chasseresse à la lance (ascendance justifiée), découpé en paliers (campagne début/fin, premières cartes, endgame), avec le moteur central et les synergies expliqués en chaînes, soutiens vérifiés compatibles, budget d'Esprit, plan défensif, priorités d'objets avec version budget, actions concrètes, noms FR officiels, termes techniques assumés.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "noms-existent",
+          "text": "Tous les passifs, gemmes et uniques nommés existent dans les données de l'outil (verifier_noms.mjs : aucun nom de jeu introuvable hors termes génériques)"
+        },
+        {
+          "id": "paliers",
+          "text": "Le build est découpé en au moins 4 paliers de progression couvrant campagne, premières cartes et endgame, avec les aptitudes de chaque palier"
+        },
+        {
+          "id": "transition-gemmes",
+          "text": "Les aptitudes proposées pour chaque palier sont disponibles à ce niveau (palier de gemme compatible avec le niveau du personnage)"
+        },
+        {
+          "id": "chaines-synergie",
+          "text": "Au moins 3 synergies sont expliquées sous forme de chaîne cause → effet reliant passifs/ascendance/gemmes/objets"
+        },
+        {
+          "id": "ascendance-justifiee",
+          "text": "Le choix d'ascendance est justifié par rapport au moteur du build, avec l'ordre des nœuds d'ascendance"
+        },
+        {
+          "id": "soutiens-valides",
+          "text": "Aucun groupe de gemmes proposé ne contient un soutien incompatible avec l'aptitude ni deux soutiens de même catégorie (vérifiable avec soutiens_compatibles)"
+        },
+        {
+          "id": "budget-esprit",
+          "text": "Un budget d'Esprit explicite est donné (réservations listées avec coûts, total ≤ Esprit disponible au palier)"
+        },
+        {
+          "id": "defense-chiffree",
+          "text": "Le plan défensif fixe des objectifs chiffrés (résistances élémentaires à 75 % en cartes, résistance au chaos, vie/ES ou couche défensive)"
+        },
+        {
+          "id": "vocabulaire-glossaire",
+          "text": "Vocabulaire officiel : verifier_noms.mjs (glossaire du serveur) ne signale aucun terme à corriger dans reponse.md et notes_build.md (pas de noms anglais entre parenthèses ni de jargon : crit, DPS, ES, buff…)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "analyse-build-moine-foudre-endgame",
+      "prompt": "regarde mon build Moine Foudre 4/4 endgame (le niveau 90), dis moi ce qui va pas, quelles synergies je rate et ce que tu changerais dans l'arbre et les gemmes",
+      "expected_output": "Lecture du build existant via les outils, identification du moteur (Évocateur, crit, foudre/Électrocution), diagnostic offense/défense/ressources classé par impact, propositions concrètes de respec avec coûts en points, soutiens vérifiés, sans modifier le build du joueur.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "build-lu",
+          "text": "La réponse s'appuie sur le contenu réel du build (cite des gemmes, passifs ou objets effectivement présents dans le build 34mdk7ubhqtg)"
+        },
+        {
+          "id": "moteur-identifie",
+          "text": "Le moteur du build est identifié (aptitude principale, ascendance Évocateur et sa mécanique centrale)"
+        },
+        {
+          "id": "diagnostic-3-axes",
+          "text": "Le diagnostic couvre offense, défense ET ressources (Esprit/mana/attributs), avec des problèmes classés par impact"
+        },
+        {
+          "id": "changements-chiffres",
+          "text": "Au moins 3 changements concrets de l'arbre sont proposés avec leur coût en points (retirer X / prendre Y)"
+        },
+        {
+          "id": "noms-existent",
+          "text": "Tous les passifs, gemmes et uniques nommés existent dans les données de l'outil"
+        },
+        {
+          "id": "soutiens-valides",
+          "text": "Les soutiens proposés sont compatibles avec leur aptitude et sans doublon de catégorie dans un même groupe"
+        },
+        {
+          "id": "pas-de-dps-invente",
+          "text": "Aucun chiffre de DPS absolu inventé ; les gains sont exprimés en multiplicateurs relatifs et/ou renvoient à une vérification PoB"
+        },
+        {
+          "id": "vocabulaire-glossaire",
+          "text": "Vocabulaire officiel : verifier_noms.mjs (glossaire du serveur) ne signale aucun terme à corriger dans reponse.md et notes_build.md (pas de noms anglais entre parenthèses ni de jargon : crit, DPS, ES, buff…)"
+        },
+        {
+          "id": "actions-en-tete",
+          "text": "La réponse commence par 3 à 5 actions prioritaires ordonnées, actionnables en jeu ou dans l'outil"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "diagnostic-moine-niveau-30-campagne",
+      "prompt": "je suis niveau 30 avec mon moine (c'est le build Moine Foudre 2/4 dans l'outil), j'ai l'impression de pas faire assez de dégâts et je meurs souvent dans l'acte 3. c'est quoi qui va pas et je fais quoi ?",
+      "expected_output": "Lecture du build Moine Foudre 2/4, diagnostic adapté au milieu de campagne (niveaux de gemmes, dégâts plats d'arme, résistances vs pénalités d'acte, vie/ES, soutiens, passifs mal placés), priorités concrètes hiérarchisées, sans modifier le build.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "build-lu",
+          "text": "La réponse s'appuie sur le contenu réel du build Moine Foudre 2/4 (gemmes/passifs/objets effectivement présents)"
+        },
+        {
+          "id": "leviers-campagne",
+          "text": "Mentionne les leviers de dégâts propres à la campagne : niveau des gemmes et/ou arme (dégâts plats, base à jour)"
+        },
+        {
+          "id": "resistances-acte",
+          "text": "Traite les résistances en tenant compte de la pénalité de l'acte (ou des boss élémentaires de l'acte 3)"
+        },
+        {
+          "id": "defense-campagne",
+          "text": "Donne au moins deux leviers défensifs concrets adaptés à l'acte 3 (vie/ES, flacons, Charmes, passifs défensifs, couche de mitigation)"
+        },
+        {
+          "id": "noms-existent",
+          "text": "Tous les passifs, gemmes et uniques nommés existent dans les données de l'outil"
+        },
+        {
+          "id": "vocabulaire-glossaire",
+          "text": "Vocabulaire officiel : verifier_noms.mjs (glossaire du serveur) ne signale aucun terme à corriger dans reponse.md et notes_build.md (pas de noms anglais entre parenthèses ni de jargon : crit, DPS, ES, buff…)"
+        },
+        {
+          "id": "actions-en-tete",
+          "text": "La réponse commence par 3 à 5 actions prioritaires ordonnées, actionnables en jeu ou dans l'outil"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "question-expert-infernaliste-flamme-noire",
+      "prompt": "Infernaliste ignite sorts de feu : Pacte de la flamme noire, ça vaut le coup ? Comment ça interagit avec l'amplitude de l'embrasement, la pénétration et les modificateurs feu de l'arbre après conversion ? Et quels nœuds d'ascendance / notables prendre autour ?",
+      "expected_output": "Texte exact de Pacte de la flamme noire (Blackflame Covenant) depuis les données, interaction avec l'Embrasement (ce qui compte pour l'Amplitude, modificateurs du type final après conversion, résistances chaos vs feu, pénétration non applicable aux DoT), conditions où c'est rentable ou non, nœuds d'Infernaliste et notables synergiques vérifiés avec coûts, réponse technique sans vulgarisation inutile.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "texte-exact",
+          "text": "Cite fidèlement l'effet de Pacte de la flamme noire : 100 % du feu des Sorts de feu converti en chaos, le chaos contribue à l'Amplitude de l'Inflammabilité et de l'Embrasement, l'Embrasement inflige du chaos"
+        },
+        {
+          "id": "conversion-type-final",
+          "text": "Explique qu'après conversion les modificateurs de dégâts de feu ne s'appliquent plus à la Touche convertie (seuls ceux du type final, chaos, et les génériques s'appliquent) — ou signale explicitement le point comme à vérifier"
+        },
+        {
+          "id": "penetration-dot",
+          "text": "Indique que la Pénétration ne s'applique pas aux dégâts de l'Embrasement (DoT) et/ou que la Pénétration feu devient inutile après conversion"
+        },
+        {
+          "id": "resistance-chaos",
+          "text": "Explique que l'Embrasement chaos est réduit par la résistance au chaos de l'ennemi au lieu de la résistance au feu (et les conséquences sur Sensibilité/malédictions feu)"
+        },
+        {
+          "id": "verdict-conditionnel",
+          "text": "Donne un verdict conditionnel clair (quand ça vaut le coup, quand non)"
+        },
+        {
+          "id": "noeuds-infernaliste-existent",
+          "text": "Les nœuds d'Infernaliste et notables proposés existent dans les données et leurs effets cités correspondent au texte du jeu"
+        },
+        {
+          "id": "couts-points",
+          "text": "Donne le coût en points d'au moins certains notables/clé de voûte, exact à ±1 point près selon planifier_arbre.mjs (en précisant s'il est cumulé ou depuis le départ)"
+        },
+        {
+          "id": "vocabulaire-glossaire",
+          "text": "Vocabulaire officiel : verifier_noms.mjs (glossaire du serveur) ne signale aucun terme à corriger dans reponse.md et notes_build.md (pas de noms anglais entre parenthèses ni de jargon : crit, DPS, ES, buff…)"
+        },
+        {
+          "id": "piege-archonte",
+          "text": "Signale que l'Archonte élémentaire (Corps incandescent, Ignition de l'Arbitre) interdit les dégâts non élémentaires avec les Sorts et est donc incompatible avec Pacte de la flamme noire — et ne le recommande pas avec le Pacte"
+        }
+      ]
+    }
+  ]
+}

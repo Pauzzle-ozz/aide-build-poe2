@@ -1,0 +1,150 @@
+{
+  "id": "d9druh09hqs5",
+  "name": "Moine Foudre 1/4 — Niv. 1 à 15",
+  "createdAt": "2026-11-14T22:35:18.101Z",
+  "updatedAt": "2026-11-15T01:00:43.365Z",
+  "class": "Monk",
+  "ascendancy": null,
+  "level": 15,
+  "tree": {
+    "nodes": [
+      10364,
+      55342,
+      17248,
+      53960,
+      49220,
+      8975,
+      4157,
+      36778,
+      61196,
+      34168,
+      36479,
+      58329,
+      13419,
+      56360,
+      630,
+      64643,
+      17548,
+      27176,
+      56045,
+      38676,
+      27910,
+      64056
+    ],
+    "attributes": {
+      "8975": "Intelligence",
+      "17248": "Intelligence",
+      "53960": "Dexterity",
+      "55342": "Dexterity",
+      "58329": "Intelligence",
+      "61196": "Dexterity"
+    },
+    "weaponSet1": [],
+    "weaponSet2": []
+  },
+  "skills": [
+    {
+      "id": "b1s1",
+      "label": "Aptitude principale (zone)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemFallingThunder",
+          "level": 5,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemMagnifiedAreaSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b1s2",
+      "label": "Rares et boss (dès le niv. 6)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestBell",
+          "level": 5,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemConcentratedAreaSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemElementalArmamentSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b1s3",
+      "label": "Esprit (30 d'Esprit, fin de l'Acte 1)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeraldOfThunder",
+          "level": 4,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemDeadlyCurrentSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeightenedAccuracySupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    }
+  ],
+  "items": {
+    "Weapon 1": {
+      "rarity": "MAGIC",
+      "name": "Bâton de combat gothique",
+      "nameEn": "Bâton de combat gothique",
+      "base": "Bâton de combat gothique",
+      "baseEn": "Gothic Quarterstaff",
+      "baseId": "Gothic_Quarterstaff",
+      "iconUrl": "https://cdn.poe2db.tw/image/Art/2DItems/Weapons/TwoHandWeapons/WarStaves/Warstaff03.webp",
+      "properties": [
+        "Dégâts Physiques: 16-26",
+        "Chances de Touche critique: 12%",
+        "Attaques par seconde: 1.4",
+        "Allonge: 1.4"
+      ],
+      "implicitsFr": [],
+      "implicits": [],
+      "explicitsFr": [
+        "Ajoute 2 à 24 Dégâts de Foudre",
+        "9% d'Augmentation de la Vitesse d'Attaque"
+      ],
+      "explicits": [
+        "Adds 2 to 24 Lightning Damage",
+        "9% increased Attack Speed"
+      ]
+    }
+  },
+  "notes": "# Moine Foudre — étape 1/4 (niveaux 1 à 15)\n\n**La direction :** un Moine qui deviendra **Évocateur** et transforme son bâton de combat en paratonnerre. On **électrocute** tout, on accumule des **Charges de pouvoir** et on les dépense en éclairs. À l'endgame (étape 4) : build **critique foudre** qui nettoie l'écran (Héraut, Manifestation élémentaire, Foudre vivante) et fond les boss (Déluge céraunien + Cloche tempétueuse).\n\nChaque étape **reprend la précédente** : vous n'avez jamais à refaire votre arbre, vous ajoutez seulement des points.\n\n## Arme\n- Niv. 1-10 : n'importe quel **Bâton de combat** (le *Bâton de combat long*, niv. 4, est très bien).\n- Dès le niv. 11 : **Bâton de combat gothique** (12 % de critique de base). Cherchez **« Ajoute X à Y Dégâts de Foudre »** (dès le niv. 8 : jusqu'à 2-27) et de la **Vitesse d'attaque**.\n- Bonus si vous le trouvez : l'unique *Pilier du Dieu en cage* (niv. 4).\n\n## Aptitudes et soutiens (2 soutiens par gemme à ce stade)\n1. **Grondement de tonnerre** (niv. 1), l'aptitude principale. Un Fracas en cône ; quand vous aurez des Charges de pouvoir, il les consomme pour projeter des éclairs.\n   - *Électrocution* : vos coups électrocutent plus souvent. C'est le moteur du build : ça active **Essence de l'orage**, le **Héraut** et plus tard tout l'arbre.\n   - *Zone agrandie I* : zone plus grande, nettoyage plus rapide.\n2. **Cloche tempétueuse** (dès le niv. 6), pour les rares et les boss. Vos autres attaques remplissent l'Enchaînement ; une fois plein, posez la cloche et **frappez-la** : chaque coup crée une onde de choc. Si la cloche est électrocutée, les ondes font des dégâts de foudre en plus.\n   - *Zone concentrée* : +30 % de dégâts de zone (zone réduite, parfait sur une cible).\n   - *Armement élémentaire I* : davantage de dégâts élémentaires pour vos attaques (prérequis +5 Force : le moine en a 7, ça passe).\n3. **Héraut du tonnerre** (gemme d'Esprit, palier 4). Dès que vous avez **30 d'Esprit**, c'est-à-dire après le boss **Roi des Brumes** à l'Acte 1. Tuer un ennemi électrocuté fait tomber des éclairs sur tous les ennemis autour : énorme nettoyage.\n   - *Courant conducteur* : chaque électrocution déclenche des projectiles de foudre qui ricochent.\n   - *Précision accrue I* : les éclairs du Héraut ratent moins.\n\n## Arbre passif (18 points = 14 niveaux + 4 Points de Talent d'Ensemble d'armes)\nOrdre conseillé : **Essence de l'orage → Vague écrasante → Moment de vérité → Le Pouvoir intérieur**.\n- **Essence de l'orage** : 5 % des dégâts ajoutés en foudre + 30 % de chances d'électrocuter. Le cœur du début de build.\n- **Vague écrasante** : +25 % de dégâts si vous avez infligé un critique dans les 8 dernières secondes. Le bâton a 10-12 % de critique de base, donc en meute c'est presque toujours actif.\n- **Moment de vérité** et **Le Pouvoir intérieur** : premiers bonus critiques et **+1 Charge de pouvoir maximum**, donc plus d'éclairs pour Grondement de tonnerre.\n- **Nœuds d'attribut** : en Dextérité et Intelligence (déjà réglés dans l'outil). Les aptitudes au bâton demandent les deux ; le Héraut demande beaucoup de Dextérité.\n- Les **Points de Talent d'Ensemble d'armes** (+2 deux fois à l'Acte 1) se placent dans l'Ensemble d'armes 1, celui du bâton.\n\n## Comment jouer\n- En meute : Grondement de tonnerre en boucle, le Héraut termine le travail.\n- Sur un rare ou un boss : quelques coups pour remplir l'Enchaînement, Cloche tempétueuse, puis frappez la cloche.\n\n## Au niveau 15\nPassez au build **2/4**. Vous gardez tout, vous ajoutez Déluge céraunien et Frappe siphonnante, et vous prenez l'ascendance **Évocateur**."
+}

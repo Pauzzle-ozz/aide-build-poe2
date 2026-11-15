@@ -1,0 +1,10 @@
+node_modules/
+sources/
+data/cache/
+web/dist/
+data-build.log
+builds/_etat.json
+builds/_bac-a-sable.json
+builds/_brouillon-*.json
+.claude/expert-build-poe2-workspace/
+.claude/settings.local.json

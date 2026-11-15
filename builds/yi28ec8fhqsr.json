@@ -1,0 +1,233 @@
+{
+  "id": "yi28ec8fhqsr",
+  "name": "Moine Foudre 2/4 — Niv. 15 à 30 (Évocateur)",
+  "createdAt": "2026-11-14T22:35:18.123Z",
+  "updatedAt": "2026-11-15T01:01:11.593Z",
+  "class": "Monk",
+  "ascendancy": "Invoker",
+  "level": 30,
+  "tree": {
+    "nodes": [
+      10364,
+      17268,
+      55342,
+      7621,
+      17248,
+      53960,
+      49220,
+      8975,
+      4157,
+      21336,
+      36778,
+      61196,
+      34168,
+      62984,
+      36479,
+      58329,
+      13419,
+      31950,
+      56360,
+      630,
+      8569,
+      7405,
+      64643,
+      17548,
+      47177,
+      55507,
+      46034,
+      4850,
+      27176,
+      40760,
+      22359,
+      41029,
+      35503,
+      21779,
+      23764,
+      57204,
+      35760,
+      9141,
+      5703
+    ],
+    "attributes": {
+      "8569": "Dexterity",
+      "8975": "Intelligence",
+      "17248": "Intelligence",
+      "31950": "Dexterity",
+      "41029": "Intelligence",
+      "46034": "Dexterity",
+      "47177": "Intelligence",
+      "53960": "Dexterity",
+      "55342": "Dexterity",
+      "58329": "Intelligence",
+      "61196": "Dexterity"
+    },
+    "weaponSet1": [],
+    "weaponSet2": []
+  },
+  "skills": [
+    {
+      "id": "b2s1",
+      "label": "Nettoyage (consomme les Charges de pouvoir)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemFallingThunder",
+          "level": 8,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemMagnifiedAreaSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b2s2",
+      "label": "Cible unique + électrocution",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestFlurry",
+          "level": 8,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemLightningPenetrationSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b2s3",
+      "label": "Générateur de Charges de pouvoir (niv. 22)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemSiphoningStrike",
+          "level": 8,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemEmpoweredSparksSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockConductionSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b2s4",
+      "label": "Rares et boss",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestBell",
+          "level": 8,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemConcentratedAreaSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemElementalArmamentSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b2s5",
+      "label": "Esprit",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeraldOfThunder",
+          "level": 6,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b2s6",
+      "label": "Esprit (défense, possible grâce à Matsya)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemGhostDance",
+          "level": 6,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    }
+  ],
+  "items": {
+    "Weapon 1": {
+      "rarity": "UNIQUE",
+      "uniqueId": "Matsya",
+      "name": "Matsya",
+      "nameEn": "Matsya",
+      "base": "Bâton de combat falciforme",
+      "baseEn": "Crescent Quarterstaff",
+      "iconUrl": "https://cdn.poe2db.tw/image/Art/2DItems/Weapons/TwoHandWeapons/WarStaves/Uniques/Matsya.webp",
+      "implicitsFr": [],
+      "explicitsFr": [
+        "Ajoute (6—9) à (10—15) Dégâts de Froid",
+        "Ajoute 1 à (19—29) Dégâts de Foudre",
+        "+(3—5)% aux Chances de Touche critique",
+        "(15—20)% d'Augmentation de la Vitesse d'Attaque",
+        "(25—40)% d'Augmentation du Taux de Régénération de Mana",
+        "Les Aptitudes ont 50% de Perte d'Esprit Réservé"
+      ],
+      "implicits": [],
+      "explicits": [],
+      "requirements": [
+        "Niveau 20, 30 Dex, 14 Int"
+      ]
+    }
+  },
+  "notes": "# Moine Foudre — étape 2/4 (niveaux 15 à 30)\n\n**Le principe :** **Déluge céraunien** Électrocute, **Frappe siphonnante** consomme l'Électrocution d'une cible et donne une **Charge de pouvoir**, **Grondement de tonnerre** consomme les Charges de pouvoir et projette des éclairs. Sans Charge de pouvoir, Grondement de tonnerre ne lance **aucun** projectile : la boucle doit tourner.\n\n## À faire en priorité\n1. **Résistances à 30 % minimum** après la pénalité de l'Acte 3 (−20 %). Le feu est souvent le plus bas (la récompense de feu arrive à l'Acte 3). Flacon de vie colossal dès le niveau 30, Charme de pierre si vous êtes souvent Étourdi, Charme antidote contre le Poison.\n2. **Héraut du tonnerre : Harmonie avec la foudre + Électrocution.** Les anciens soutiens ne faisaient rien (voir plus bas).\n3. **Grondement de tonnerre seulement avec des Charges de pouvoir** (voir « Comment jouer »).\n4. **Les 8 points suivants (niveaux 31 à 36) vont dans la défense** : Scintillant puis Foi intérieure (étape 3/4).\n5. **Gemmes au niveau 8** (9 dès le niveau 31) et un bâton à jour : le plus gros « Ajoute X à Y Dégâts de Foudre » possible et de la Vitesse d'attaque.\n\n## Ce qui a changé dans cette version (et pourquoi)\n- **Flammes résonnantes retirée** : elle demande d'avoir Embrasé un ennemi, et ce build n'inflige jamais de feu. Tonnerre résonnant est maintenant pris par l'autre chemin (deux nœuds de Dégâts élémentaires), pour le même nombre de points : +10 % de Dégâts élémentaires en plus.\n- **Héraut du tonnerre** : *Courant conducteur* ne touche que les ennemis Trempés (rien ne les Trempe ici) et *Précision accrue I* est inutile, car les éclairs du Héraut ignorent l'Évasion. Remplacés par **Harmonie avec la foudre** (Rajoute 25 % des Dégâts sous forme de Dégâts de Foudre) et **Électrocution** (100 % Davantage de chances d'Électrocuter : plus de cibles Électrocutées à siphonner). Il faut une gemme par aptitude : deux Harmonie avec la foudre, deux Électrocution.\n- **Déluge céraunien** : *Innervation* ne s'active qu'en tuant un ennemi Électrocuté, donc presque jamais contre un boss seul. Remplacée par **Harmonie avec la foudre**, active en permanence.\n- **Frappe siphonnante au niveau 8** (possible dès le niveau 26).\n\n## Ascendance : Évocateur (2 points)\nPremière Épreuve d'ascendance (Épreuve des Sekhemas à l'Acte 2, ou Épreuve de Chaos à l'Acte 3) : **Effet d'Électrocution** → **Je suis le Tonnerre…** (Rajoute 10 % des Dégâts sous forme de Dégâts de Foudre, 25 % de chances de créer du Sol électrocutant en Électrocutant).\n\n## Arme\n- **Matsya** (niveau 20) : foudre et froid ajoutés, Chances de Touche critique, Vitesse d'attaque, Régénération de Mana, et surtout **« Les Aptitudes ont 50 % de Perte d'Esprit Réservé »** : Héraut du tonnerre et Danse fantomatique tiennent dans les 30 d'Esprit de l'Acte 1. Harmonie avec la foudre réduit le froid de Matsya de moitié sur les aptitudes modifiées : le gain en foudre compense largement.\n- Sans Matsya : **Bâton de combat crépitant** (niveau 16) avec « Ajoute X à Y Dégâts de Foudre » et de la Vitesse d'attaque, et gardez seulement le Héraut.\n\n## Aptitudes et soutiens\n1. **Grondement de tonnerre** : Électrocution + Zone agrandie I (nettoyage).\n2. **Déluge céraunien** : Pénétration de la foudre + Harmonie avec la foudre (cible unique ; le 4ᵉ coup fait tomber un éclair qui Électrocute).\n3. **Frappe siphonnante** (niveau 22) : Étincelles améliorées I + Électrocution propagée (Électrocute aussi les ennemis autour : plus de cibles à siphonner).\n4. **Cloche tempétueuse** : Zone concentrée + Armement élémentaire II (rares et boss).\n5. **Héraut du tonnerre** : Harmonie avec la foudre + Électrocution.\n6. **Danse fantomatique** : des Voiles fantomatiques absorbent des coups et rendent du Bouclier d'énergie.\n\n## Arbre passif (37 points = 29 niveaux + 8 Points de Talent d'Ensemble d'armes)\n- **Pleine conscience** : Évasion et Bouclier d'énergie (votre défense).\n- **Courant alternatif** : Amplitude de l'Électrocution et Régénération de Mana quand vous Électrocutez.\n- **Tonnerre résonnant** : 30 % d'Augmentation des Dégâts élémentaires si vous avez Électrocuté récemment (presque tout le temps).\n- **Prouesses critiques** : 25 % d'Augmentation des Chances de Touche critique.\n\n## Défense : le point faible actuel\nL'arbre ne donne **aucune Vie** : Pleine conscience multiplie seulement l'Évasion et le Bouclier d'énergie de l'équipement. Portez donc des pièces Évasion / Bouclier d'énergie de votre niveau avec de la Vie et des résistances. Le Bouclier d'énergie ne protège pas du Poison ni du Saignement, et l'Évasion n'évite pas les dégâts sur la durée : c'est le rôle des Charmes et du Flacon. Le Seuil d'Étourdissement dépend de la Vie : peu de Vie, beaucoup d'Étourdissements.\n\n## Comment jouer\n- **Meute** : Grondement de tonnerre (Électrocute) → Frappe siphonnante de cible Électrocutée en cible Électrocutée (+1 Charge de pouvoir à chaque fois) → Grondement de tonnerre avec toutes les charges ; le Héraut achève.\n- **Boss** : Déluge céraunien jusqu'au 4ᵉ coup (l'éclair Électrocute) → Frappe siphonnante (Charge de pouvoir) → recommencez → Grondement de tonnerre avec les charges ; Cloche tempétueuse quand l'Enchaînement est plein (Électrocutez la Cloche avant de la frapper).\n\n## Au niveau 30\nPassez au build **3/4** : 3ᵉ soutien sur les aptitudes, Bâton chargé, ascendance « Déchirez mes ennemis… », et la défense (Scintillant, puis Foi intérieure).\n"
+}

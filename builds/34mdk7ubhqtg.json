@@ -1,0 +1,488 @@
+{
+  "id": "34mdk7ubhqtg",
+  "name": "Moine Foudre 4/4 — Endgame (niv. 90)",
+  "createdAt": "2026-11-14T22:35:18.148Z",
+  "updatedAt": "2026-11-15T01:00:33.123Z",
+  "class": "Monk",
+  "ascendancy": "Invoker",
+  "level": 90,
+  "tree": {
+    "nodes": [
+      10364,
+      44357,
+      17268,
+      55342,
+      63713,
+      7621,
+      17248,
+      57181,
+      55611,
+      53960,
+      52448,
+      64031,
+      49220,
+      8975,
+      4157,
+      21336,
+      36778,
+      61196,
+      34168,
+      62984,
+      36479,
+      58329,
+      56045,
+      13419,
+      31950,
+      56360,
+      11604,
+      62841,
+      630,
+      8569,
+      7405,
+      64643,
+      17088,
+      53941,
+      17548,
+      47177,
+      46034,
+      4850,
+      27176,
+      61834,
+      11672,
+      40760,
+      41029,
+      35503,
+      16705,
+      51741,
+      24958,
+      48030,
+      39037,
+      21779,
+      13748,
+      25557,
+      23764,
+      34621,
+      57821,
+      41877,
+      62436,
+      517,
+      57204,
+      9141,
+      24165,
+      535,
+      38541,
+      31765,
+      54678,
+      3215,
+      9642,
+      5703,
+      8908,
+      20677,
+      61601,
+      722,
+      36231,
+      32123,
+      13711,
+      4346,
+      15775,
+      25565,
+      3336,
+      27875,
+      30562,
+      4519,
+      30808,
+      11598,
+      15343,
+      8273,
+      17420,
+      30615,
+      23905,
+      13724,
+      14267,
+      4536,
+      44516,
+      58692,
+      60239,
+      18717,
+      65204,
+      1953,
+      32763,
+      37514,
+      2113,
+      26556,
+      49356,
+      60483,
+      40480,
+      48773,
+      326,
+      59657,
+      7809,
+      27705,
+      38493,
+      31449,
+      2582,
+      55621,
+      9444,
+      56847,
+      38537,
+      28835,
+      54983,
+      28044,
+      39369
+    ],
+    "attributes": {
+      "722": "Intelligence",
+      "2582": "Dexterity",
+      "8569": "Dexterity",
+      "8975": "Intelligence",
+      "11604": "Intelligence",
+      "11672": "Dexterity",
+      "14267": "Intelligence",
+      "15775": "Dexterity",
+      "16705": "Dexterity",
+      "17088": "Intelligence",
+      "17248": "Intelligence",
+      "24165": "Dexterity",
+      "24958": "Intelligence",
+      "25557": "Intelligence",
+      "27705": "Dexterity",
+      "30808": "Dexterity",
+      "31765": "Dexterity",
+      "31950": "Dexterity",
+      "39037": "Dexterity",
+      "41029": "Intelligence",
+      "41877": "Dexterity",
+      "46034": "Dexterity",
+      "47177": "Intelligence",
+      "48773": "Dexterity",
+      "51741": "Dexterity",
+      "53960": "Dexterity",
+      "55342": "Dexterity",
+      "56045": "Intelligence",
+      "57821": "Intelligence",
+      "58329": "Intelligence",
+      "61196": "Dexterity"
+    },
+    "weaponSet1": [],
+    "weaponSet2": []
+  },
+  "skills": [
+    {
+      "id": "b4s1",
+      "label": "Nettoyage (consomme les Charges de pouvoir)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemFallingThunder",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemMagnifiedAreaSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAftershockChanceSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemPinpointCritical",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemLightningExposureSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s2",
+      "label": "Boss : cible unique",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestFlurry",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemPinpointCritical",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemElementalArmamentSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemPracticedComboSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemCloseCombatSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s3",
+      "label": "Générateur de Charges de pouvoir",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemSiphoningStrike",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemEmpoweredSparksSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemShockConductionSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemChargeProfusionSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s4",
+      "label": "Boss : grosse frappe",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemTempestBell",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemConcentratedAreaSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemElementalArmamentSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemPinpointCritical",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemCloseCombatSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s5",
+      "label": "Buff : foudre sur toutes les attaques",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemChargedStaff",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemLightningMasterySupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeightenedChargesSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemProlongedDurationSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s6",
+      "label": "Déplacement + nettoyage (fait exploser la Cloche)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemGatheringStorm",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemLivingLightningSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemInnervateSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemStaticShocksSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s7",
+      "label": "Esprit",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemHeraldOfThunder",
+          "level": 16,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAddedLightningDamageSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemElementalArmamentSupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemDeadlyHeraldsSupport",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s8",
+      "label": "Esprit (défense)",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemGhostDance",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        },
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemClaritySupportTwo",
+          "level": 1,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "b4s9",
+      "label": "Ascendance : Avatar déchaîné",
+      "enabled": true,
+      "gems": [
+        {
+          "gemId": "Metadata/Items/Gems/SkillGemAscendancyUnboundAvatar",
+          "level": 20,
+          "quality": 0,
+          "enabled": true
+        }
+      ]
+    }
+  ],
+  "items": {
+    "Weapon 1": {
+      "rarity": "RARE",
+      "name": "Colère du ciel",
+      "nameEn": "Colère du ciel",
+      "base": "Bâton de combat fulminant",
+      "baseEn": "Bolting Quarterstaff",
+      "baseId": "Bolting_Quarterstaff",
+      "iconUrl": "https://cdn.poe2db.tw/image/Art/2DItems/Weapons/TwoHandWeapons/WarStaves/Warstaff04.webp",
+      "properties": [
+        "Dégâts Physiques: 24-97",
+        "Chances de Touche critique: 10%",
+        "Attaques par seconde: 1.4",
+        "Allonge: 1.4"
+      ],
+      "implicitsFr": [
+        "Ajoute 1 à 100 Dégâts de Foudre (base)"
+      ],
+      "implicits": [],
+      "explicitsFr": [
+        "Ajoute 15 à 330 Dégâts de Foudre",
+        "25% d'Augmentation de la Vitesse d'Attaque",
+        "+4.6% aux Chances de Touche critique"
+      ],
+      "explicits": [
+        "Adds 15 to 330 Lightning Damage",
+        "25% increased Attack Speed",
+        "+4.6% to Critical Hit Chance"
+      ]
+    }
+  },
+  "notes": "# Moine Foudre — étape 4/4 : endgame (niveau 90)\n\n**Évocateur, Bâton de combat, foudre et Touches critiques.** Frappe siphonnante fabrique les Charges de pouvoir, Bâton chargé et Grondement de tonnerre les dépensent, Déluge céraunien et Cloche tempétueuse tuent les boss. Le cœur du build : **Déchirez mes ennemis…** (les Touches critiques ignorent les Résistances élémentaires positives). Tout le reste sert à infliger des Touches critiques souvent.\n\n## À faire en priorité\n1. **Chances de Touche critique** : c'est maintenant elles qu'on monte, pas le Bonus (voir plus bas). Visez plus de 70 % sur Déluge céraunien avec Critiques névralgiques.\n2. **Résistances à 75 %** (foudre, froid, feu), puis la Résistance au chaos.\n3. **Mana** : Clarté II sur Danse fantomatique ; complétez avec de la Régénération de Mana sur l'équipement.\n4. **Châsses de Joyau** de l'arbre : mettez-y des Joyaux (Chances de Touche critique, Bouclier d'énergie, Vitesse d'attaque).\n5. **Qualité des gemmes** : Prisme de lapidaire sur Déluge céraunien, Grondement de tonnerre et Frappe siphonnante.\n\n## Ce qui a changé dans cette version (et pourquoi)\n1. **Moins de Pénétration.** La Pénétration ne fait jamais descendre une résistance sous 0 %, et une Touche critique avec Déchirez mes ennemis… traite déjà la résistance positive comme 0 %. Surcharge, Exposé à l'orage et leurs 5 petits nœuds (7 points) ne servaient qu'aux coups non critiques : retirés, tout comme le soutien Pénétration de la foudre sur Déluge céraunien.\n2. **Plus de Chances de Touche critique, moins de Bonus.** Avant : environ 39 % de chances de Touche critique pour +320 % d'Augmentation du Bonus. Or Déchirez mes ennemis…, Manifestation élémentaire et Générateur harmonique ne fonctionnent qu'avec des Touches critiques. Perce-gorge (−20 % de Chances de Touche critique) est retiré ; **Arrêt du cœur** et **Annuler d'un trait** sont ajoutés, et **Critiques névralgiques** (60 % Davantage de Chances de Touche critique, 30 % de Perte de Bonus) va sur Déluge céraunien et Cloche tempétueuse. Résultat estimé : environ 49 % avec l'arbre seul, environ 78 % avec Critiques névralgiques (à confirmer dans Path of Building).\n3. **Défense.** **Fusion** (40 % d'Augmentation du Bouclier d'énergie maximal, mais 10 % de Réduction du Mana maximal) et **Bouclier atténuant** (Bouclier d'énergie, et Seuils d'Étourdissement et d'Altération selon le Bouclier d'énergie) : environ +44 % de Bouclier d'énergie.\n4. **Flammes résonnantes retirée** (le build n'Embrase jamais) ; Tonnerre résonnant repris par l'autre chemin.\n5. **Soutiens qui ne faisaient rien, remplacés :**\n   - Héraut du tonnerre : *Courant conducteur* (ne touche que les ennemis Trempés) et *Précision accrue II* (les éclairs ignorent l'Évasion) → **Harmonie avec la foudre** + **Armement élémentaire II**.\n   - Déluge céraunien : *Innervation* (il faut tuer, rare contre un boss) → **Armement élémentaire II** ; elle passe sur **Tempête imminente**, qui tue des meutes (à la place de *Poursuite II*).\n   - Frappe siphonnante : *Embuscade* (la cible siphonnée a déjà été touchée, donc jamais à pleine Vie) → **Charges abondantes I** (30 % de chances d'une Charge supplémentaire).\n   - Cloche tempétueuse : *Supercritique* et *Critique inexorable II* tiraient en sens contraire, *Électrocution durable* ne prolonge que les Électrocutions infligées par la Cloche → **Critiques névralgiques**, **Harmonie avec la foudre**, **Combat rapproché II**.\n   - Bâton chargé : + **Charges exaltées** et **Durée prolongée II**.\n6. **Esprit 100 / 100** : les 20 d'Esprit restants servent à **Clarté II** (50 % d'Augmentation du Taux de Régénération de Mana).\n\n## Pourquoi ça marche (les chaînes)\n- **Boucle de Charges** : Frappe siphonnante consomme l'Électrocution d'une cible → Charge de pouvoir (+30 % de chances d'une de plus avec Charges abondantes I) → **Circuit interminable** réapplique l'Électrocution 1 fois sur 4, on peut resiphonner la même cible → Bâton chargé consomme les Charges et ajoute de la foudre à toutes les attaques au Bâton de combat → **En harmonie avec la tempête** compte une Charge de plus à chaque consommation → Grondement de tonnerre tire 3 projectiles par Charge.\n- **Touche critique → résistance à 0** : Touche critique → Déchirez mes ennemis… ignore la résistance positive → la Pénétration devient inutile sur ces coups.\n- **Exposition sous zéro** : Grondement de tonnerre Électrocute → Exposition à la foudre baisse la Résistance à la foudre → un monstre à 0 % passe en négatif ; Déchirez mes ennemis… n'ignore que le positif, donc le négatif s'applique aussi à vos Touches critiques.\n- **Touche critique → Manifestation élémentaire** : chaque Touche critique de Mêlée déclenche Manifestation élémentaire (surtout des arcs électriques, car la Dextérité domine).\n- **Altérations → Avatar déchaîné** : chaque Altération élémentaire infligée au Toucher remplit la Furie déchaînée → une fois pleine, Avatar déchaîné donne **40 % Davantage de Dégâts élémentaires** et 80 % Davantage de chances d'infliger des Altérations élémentaires.\n- **Héraut** : Calamité imminente renforce la foudre tant que Héraut du tonnerre vous affecte ; Hérauts mortels donne 30 % Davantage de Dégâts au Héraut.\n\n## Ascendance Évocateur (8 points)\n1. **Je suis le Tonnerre…** — 2. **Déchirez mes ennemis…** — 3. **… et dispersez-les aux vents** (Manifestation élémentaire sur Touche critique de Mêlée) — 4. **… et je me déchaîne** (Avatar déchaîné).\n\n## Aptitudes et soutiens (tous vérifiés compatibles, une seule gemme par catégorie et par aptitude)\n1. **Grondement de tonnerre** (nettoyage) : Électrocution, Zone agrandie II, Réplique II, Critiques névralgiques, Exposition à la foudre.\n2. **Déluge céraunien** (boss) : Critiques névralgiques, Armement élémentaire II, Enchaînement maîtrisé, Combat rapproché II, Harmonie avec la foudre.\n3. **Frappe siphonnante** (Charges de pouvoir) : Étincelles améliorées I, Électrocution propagée, Charges abondantes I.\n4. **Cloche tempétueuse** (boss) : Zone concentrée, Armement élémentaire II, Critiques névralgiques, Harmonie avec la foudre, Combat rapproché II.\n5. **Bâton chargé** : Maîtrise de la foudre, Charges exaltées, Durée prolongée II.\n6. **Tempête imminente** (déplacement + nettoyage, fait exploser les Cloches tempétueuses) : Foudre vivante II, Innervation, Décharges statiques.\n7. **Héraut du tonnerre** : Harmonie avec la foudre, Armement élémentaire II, Hérauts mortels.\n8. **Danse fantomatique** : Clarté II.\n9. **Avatar déchaîné** (donné par l'ascendance).\n\n## Esprit : 100 / 100\nHéraut du tonnerre 30 + Hérauts mortels 20 · Danse fantomatique 30 + Clarté II 20. Les 100 d'Esprit viennent des quêtes : +30 Roi des Brumes (Acte 1), +30 Ignagduk (Acte 3), +40 Lythara (Interlude 3). De l'Esprit sur l'équipement permettrait d'ajouter Danseur du vent.\n\n## Attributs\nChaque soutien ajoute +5 au prérequis de sa couleur. L'arbre et la base donnent **Force 7 · Dextérité 151 · Intelligence 101** : tous les prérequis sont remplis (une seule gemme de soutien de Force par aptitude au maximum, la Force restant à 7). Héraut du tonnerre reste au niveau 16 ; montez-le si l'équipement apporte de la Dextérité.\n\n## Mana : le point à surveiller\nGrondement de tonnerre et Cloche tempétueuse coûtent chacun environ 140 de Mana au niveau 20, et Fusion réduit le Mana maximal de 10 %. Solutions : Clarté II (déjà là), Régénération de Mana et Mana maximal sur l'équipement, Courant alternatif (Régénération de Mana quand vous Électrocutez), et, si besoin, Esprit de Lavianga.\n\n## Défense\n- Résistances : 75 % feu / froid / foudre (l'arbre en donne un peu), puis le chaos (+5 % dans l'arbre).\n- Évasion et Bouclier d'énergie : Pleine conscience, Scintillant, Foi intérieure, Premier principe du Vide, Fusion, Bouclier atténuant ; Premiers enseignements du Gardien convertit 8 % de l'Évasion en Score de Déviation.\n- Danse fantomatique rend du Bouclier d'énergie ; le Bouclier d'énergie ne protège pas du Poison ni du Saignement : Charmes adaptés.\n\n## Équipement : priorités\n1. Résistances à 75 %, puis chaos.\n2. Armure de torse et casque Évasion / Bouclier d'énergie.\n3. Gants et Bagues : Dégâts de Foudre ajoutés aux Attaques, Vitesse d'attaque, Précision.\n4. Amulette : Chances de Touche critique, Esprit, attributs.\n5. Arme : Bâton de combat fulminant rare (« Ajoute X à Y Dégâts de Foudre », Vitesse d'attaque, Chances de Touche critique) ; alternative unique **Horizon vacillant**, à comparer dans Path of Building.\n\n## Comment jouer\n- **Meute** : Grondement de tonnerre → Frappe siphonnante de cible Électrocutée en cible Électrocutée → Grondement de tonnerre avec toutes les Charges ; Tempête imminente pour se déplacer.\n- **Boss** : Bâton chargé → Déluge céraunien → Frappe siphonnante → Cloche tempétueuse quand l'Enchaînement est plein ; Avatar déchaîné dès que la Furie déchaînée est pleine.\n- **Signaux** : Mana à sec → équipement / Esprit de Lavianga ; Déluge céraunien sous ~70 % de Chances de Touche critique → Joyaux et amulette ; morts sur de gros coups → plus de Bouclier d'énergie, Charmes.\n\n## Plus tard (endgame cher)\nGemmes de lignage : **Flux de Rakiata** (inverse les résistances ennemies) sur Déluge céraunien — mais alors n'utilisez plus d'Exposition ni de réduction de résistance, qui réduiraient le gain. **Siège de Vorana** est une autre option.\n\n## À vérifier\nExportez le build vers Path of Building (menu du build → Exporter PoB) une fois l'équipement saisi : dégâts de Déluge céraunien et de Grondement de tonnerre, Chances de Touche critique réelles, coût en Mana.\n"
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aide-build-poe2": {
+      "command": "node",
+      "args": ["src/mcp/server.mjs"]
+    }
+  }
+}
