@@ -128,7 +128,7 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
       </div>
       <div className="sep" />
       <div style={{ position: 'relative' }} ref={menuRef}>
-        <button className={`btn ${sandbox ? 'sandbox-btn' : ''}`} onClick={() => { if (!menu) refreshList(); setMenu((m) => !m); }} title="Changer / gérer les builds">
+        <button className={`btn build-name ${sandbox ? 'sandbox-btn' : ''}`} onClick={() => { if (!menu) refreshList(); setMenu((m) => !m); }} title="Changer / gérer les builds">
           {sandbox ? 'Bac à sable (aucun build)' : build.name} ▾
         </button>
         {menu && (
@@ -180,7 +180,7 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
           Passifs <b>{used.passive}</b> / {avail}
         </div>
         <div className={`pt ${used.ascendancy > maxAsc ? 'over' : ''}`} title="Points d'ascendance (8 au maximum, via les Épreuves)">
-          Ascendance <b>{used.ascendancy}</b> / {maxAsc}
+          <span className="long">Ascendance</span><span className="short">Asc.</span> <b>{used.ascendancy}</b> / {maxAsc}
         </div>
       </div>
       <div className="grow" />
