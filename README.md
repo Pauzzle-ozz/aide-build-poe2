@@ -118,11 +118,12 @@ scripts/            génération des données (PoB + poe2db + API d'échange FR)
   extract-assets.mjs  textures DDS du jeu -> atlas WebP (web/public/assets)
   build-data.mjs      data/tree.json, gems.json, items.json, translations.json
 src/core/           logique partagée navigateur / serveur : arbre, stats, modèle de build, opérations,
-                    stockage des builds (build-store), routes de l'API (build-routes), conversion PoB
-src/server/         serveur local : Express, WebSocket temps réel, fichiers builds/*.json, recherche, glossaire
-src/mcp/server.mjs  serveur MCP pour Claude
-web/                interface React (Vite) ; web/src/web/ = version en ligne
-cloudflare/         Worker de la version en ligne (icônes poe2db, liens PoB) ; functions/ = même chose pour Pages
+                    stockage des builds (build-store), routes de l'API (build-routes, search-routes),
+                    conversion PoB, glossaire
+src/server/         serveur local : Express, WebSocket temps réel, fichiers builds/*.json
+src/mcp/            outils MCP pour Claude (tools.mjs, partagés) ; server.mjs = serveur MCP local (stdio)
+web/                interface React (Vite) ; web/src/web/ = version en ligne (builds dans le navigateur, relais Claude)
+cloudflare/         Worker de la version en ligne : icônes poe2db, liens PoB, serveur MCP en ligne et relais
 ```
 
 Mode développement (rechargement à chaud) : `npm run dev`.
@@ -131,17 +132,18 @@ Mode développement (rechargement à chaud) : `npm run dev`.
 
 `npm run build:web` construit dans `web/dist-web` une version sans serveur : l'API des builds tourne dans le
 navigateur (mêmes routes que le serveur local) et **chaque visiteur garde ses builds dans son navigateur**
-(localStorage), avec sauvegarde/restauration dans un fichier depuis « Mes builds ». Claude (MCP) n'y est pas
-disponible. Les 4 builds de `builds/` sont proposés en exemple à la première visite.
+(localStorage), avec sauvegarde/restauration dans un fichier depuis « Mes builds ».
 
-**Cloudflare Workers** (méthode conseillée, configuration dans `wrangler.jsonc`, code dans `cloudflare/`) :
-projet relié au dépôt GitHub, nom `aide-build-poe2` (le même que dans `wrangler.jsonc`), Build command
-`npm run build:web`, Deploy command `npx wrangler deploy`, Path `/`.
+**Claude en ligne** : le bouton « ✦ Claude » donne à chaque navigateur un lien personnel secret
+`https://<site>/mcp/<jeton>`, à ajouter dans Claude comme connecteur personnalisé (réglages → Connecteurs).
+Le Worker y sert les mêmes outils que le serveur MCP local (`src/mcp/tools.mjs`) ; chaque appel est relayé
+par un Durable Object (`SessionClaude`, un par lien) vers l'onglet du site, par WebSocket (`/relais/<jeton>`),
+et exécuté sur les builds du navigateur. L'onglet doit donc rester ouvert pendant que Claude travaille.
 
-**Cloudflare Pages** (autre possibilité, via le dossier `functions/`) : Framework preset `None`, Build command
-`npm run build:web`, Build output directory `web/dist-web`.
-
-Chaque `git push` sur `main` republie le site. Test en local : `npm run build:web` puis `npx wrangler dev`.
+Déploiement **Cloudflare Workers** (configuration dans `wrangler.jsonc`) : projet relié au dépôt GitHub,
+nom `aide-build-poe2` (le même que dans `wrangler.jsonc`), Build command `npm run build:web`,
+Deploy command `npx wrangler deploy`, Path `/`. Chaque `git push` sur `main` republie le site.
+Test en local : `npm run build:web` puis `npx wrangler dev`.
 
 ## Traductions
 

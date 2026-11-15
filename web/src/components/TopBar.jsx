@@ -4,6 +4,7 @@ import { api, get, post, WEB } from '../api.js';
 import { Modal } from './Window.jsx';
 import { isSandbox, openSandbox, resetSandbox, saveSandbox, leaveSandbox, SANDBOX_ID } from '../sandbox.js';
 import { useLang } from '../lang.jsx';
+import ClaudeButton from './ClaudeConnect.jsx';
 
 export default function TopBar({ data, build, builds, doOps, showToast, connected, refreshList, switchBuild, setBuild, openPanel }) {
   const { graph } = data;
@@ -197,6 +198,7 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
         <button className={lang === 'fr' ? 'on' : ''} onClick={() => setLang('fr')}>FR</button>
         <button className={lang === 'en' ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
       </div>
+      {WEB && <ClaudeButton showToast={showToast} />}
       {!WEB && (
         <div className="row small muted" style={{ whiteSpace: 'nowrap' }} title={connected ? 'Synchronisé en temps réel (Claude peut piloter l\'interface)' : 'Connexion au serveur perdue'}>
           <span className={`status-dot ${connected ? 'on' : ''}`} /> {connected ? 'En direct' : 'Hors ligne'}

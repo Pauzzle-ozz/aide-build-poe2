@@ -36,8 +36,13 @@ export default function HelpPanel({ onClose, connected }) {
             </ul>
             <div className="section-title">Avec Claude</div>
             <p>
-              La <a href={REPO} target="_blank" rel="noreferrer">version à installer sur votre ordinateur</a> (gratuite) permet en plus à Claude de créer et modifier vos builds avec vous,
-              de chercher dans les données du jeu en français et de piloter cette interface. Pour y retrouver vos builds : sauvegarde ici, puis « Restaurer » là-bas.
+              Le bouton <b>« ✦ Claude »</b> (en haut à droite) donne un lien personnel à ajouter dans Claude comme <b>connecteur personnalisé</b>
+              (réglages de Claude, rubrique Connecteurs ; possible avec un compte gratuit). Claude peut alors lire et modifier vos builds, chercher dans les données
+              du jeu en français, écrire les notes et piloter cette page (centrer l'arbre, surligner des passifs, afficher des messages).
+              Gardez cette page ouverte pendant qu'il travaille : c'est elle qui détient vos builds. Ses modifications restent en brouillon jusqu'à ce que vous cliquiez sur « Valider ».
+            </p>
+            <p className="small muted">
+              Une <a href={REPO} target="_blank" rel="noreferrer">version à installer sur votre ordinateur</a> existe aussi, avec les builds enregistrés dans des fichiers.
             </p>
           </>
         ) : (

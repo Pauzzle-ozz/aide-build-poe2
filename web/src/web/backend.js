@@ -1,17 +1,32 @@
 // Version en ligne (Cloudflare) : pas de serveur pour les builds. L'API tourne directement dans
-// le navigateur, avec les mêmes routes que le serveur local (src/core/build-routes.mjs), et les
-// builds de chaque visiteur sont gardés dans la mémoire de SON navigateur (localStorage).
-// Seuls deux besoins passent par le réseau, via les fonctions Cloudflare du dossier functions/ :
-// les icônes de poe2db (/img) et les liens de partage PoB (/api/pob-url).
+// le navigateur, avec les mêmes routes que le serveur local (src/core/build-routes.mjs et
+// src/core/search-routes.mjs), et les builds de chaque visiteur sont gardés dans la mémoire de SON
+// navigateur (localStorage). Ce qui passe par le Worker Cloudflare (cloudflare/worker.mjs) : les icônes
+// de poe2db (/img), les liens de partage PoB (/api/pob-url) et le relais vers Claude (web/src/web/claude.js).
 import { BuildStore, SANDBOX_ID } from '@core/build-store.mjs';
 import { buildRoutes, matchRoute } from '@core/build-routes.mjs';
+import { searchRoutes } from '@core/search-routes.mjs';
+import { makeGlossary } from '@core/glossary.mjs';
 import { indexData } from '@core/data-index.mjs';
 import { pobSourceUrl } from '@core/pob-source.mjs';
 
 const PREFIX = 'aide-build-poe2:';
 
-// Builds d'exemple du projet (dossier builds/), proposés à la première visite
-const EXAMPLES = import.meta.glob(['../../../builds/*.json', '!../../../builds/_*.json'], { eager: true, import: 'default' });
+// Builds de test publiés par erreur le 15/11/2026 (proposés en exemple à la première visite) :
+// on les retire des navigateurs qui les ont reçus, s'ils n'ont pas été modifiés depuis.
+const ANCIENS_EXEMPLES = {
+  '34mdk7ubhqtg': '2026-11-15T01:00:33.123Z',
+  d9druh09hqs5: '2026-11-15T01:00:43.365Z',
+  qjvmjdsghqt4: '2026-11-15T01:00:39.103Z',
+  yi28ec8fhqsr: '2026-11-15T01:01:11.593Z',
+};
+function retirerAnciensExemples(disk) {
+  for (const [id, updatedAt] of Object.entries(ANCIENS_EXEMPLES)) {
+    try {
+      if (disk.read(id)?.updatedAt === updatedAt && !disk.has(`_brouillon-${id}`)) disk.remove(id);
+    } catch {}
+  }
+}
 
 // ------------------------------------------------------------ mémoire du navigateur
 function browserDisk() {
@@ -141,15 +156,12 @@ export async function subscribe(fn) {
 let ready = null;
 function init() {
   ready ??= (async () => {
-    const [tree, gems, items, translations] = await Promise.all(['tree', 'gems', 'items', 'translations'].map((n) => fetchJson(`/data/${n}.json`)));
-    const data = indexData({ tree, gems, items, translations });
+    const [tree, gems, items, translations, glossaryData] = await Promise.all(['tree', 'gems', 'items', 'translations', 'glossary'].map((n) => fetchJson(`/data/${n}.json`)));
+    const data = indexData({ tree, gems, items, translations, glossary: glossaryData });
+    const glossary = makeGlossary(data);
     const disk = browserDisk();
     const firstVisit = !disk.has('_etat');
-    if (firstVisit) {
-      const examples = Object.values(EXAMPLES).sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
-      for (const b of examples) disk.write(b.id, b);
-      if (examples.length) disk.write('_etat', { activeBuildId: examples[0].id, lastBuildId: null });
-    }
+    retirerAnciensExemples(disk);
     const store = new BuildStore(data, disk);
     store.on('build', ({ build, source }) => dispatch({ type: 'build', build, source }));
     store.on('list', (list) => dispatch({ type: 'list', list }));
@@ -168,7 +180,15 @@ function init() {
       } catch {}
     });
 
-    const routes = buildRoutes({ store, data, pob: browserPob, extraState: () => ({ web: true, firstVisit, persistent: disk.persistent }) });
+    const routes = [
+      ...buildRoutes({ store, data, pob: browserPob, extraState: () => ({ web: true, firstVisit, persistent: disk.persistent, uiClients: 1 }) }),
+      ...searchRoutes({ store, data, glossary }),
+      // commandes d'interface envoyées par Claude (centrer l'arbre, ouvrir un panneau, afficher un message)
+      ['post', '/api/ui', (req) => {
+        dispatch({ type: 'ui', ...(req.body || {}) });
+        return { ok: true, uiClients: 1 };
+      }],
+    ];
     return { store, routes };
   })();
   return ready;

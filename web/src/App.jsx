@@ -39,7 +39,7 @@ function webNotices(state) {
       title: 'Bienvenue',
       text: [
         'Vos builds sont enregistrés **dans ce navigateur, sur cet appareil** : ils vous attendent à votre prochaine visite, sans compte à créer.',
-        "Quatre builds d'exemple (Moine Foudre, du niveau 1 au niveau 90) sont déjà dans « Mes builds » (touche M) : modifiez-les ou supprimez-les librement.",
+        'Commencez dans le **bac à sable** (mode libre), ou créez un build avec le menu en haut à gauche. Le bouton **« ✦ Claude »** (en haut à droite) permet de connecter Claude pour qu\'il crée et modifie vos builds avec vous.',
         "Pour ne rien perdre, téléchargez de temps en temps une sauvegarde (« Mes builds » → « Télécharger une sauvegarde »). L'aide (touche H) explique le reste.",
       ].join('\n\n'),
     });

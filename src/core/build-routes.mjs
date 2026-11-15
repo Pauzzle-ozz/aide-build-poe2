@@ -4,7 +4,7 @@
 // Chaque route : [méthode, chemin façon Express, (req: { params, query, body }) => réponse JSON].
 import { SANDBOX_ID } from './build-store.mjs';
 import { summarizeBuild, normalizeBuild } from './build-model.mjs';
-import { applyOp } from './ops.mjs';
+import { applyOp, resolveClass } from './ops.mjs';
 import { pobXmlToBuild, buildToPobXml, itemFromText } from './pob.mjs';
 
 /**
@@ -17,6 +17,8 @@ export function buildRoutes({ store, data, pob, extraState = () => ({}) }) {
   const ref = (req) => (req.params.id === 'active' ? null : req.params.id);
   const body = (req) => req.body || {};
   const summary = (b, lang = 'fr') => summarizeBuild(b, { graph: data.graph, gemsById: data.gemsById, lang });
+  // classe de départ du bac à sable : id, ou nom FR/EN de classe ou d'ascendance
+  const classId = (ref) => (ref ? resolveClass(data, ref).cls.id : undefined);
 
   return [
     ['get', '/api/state', () => ({
@@ -31,11 +33,11 @@ export function buildRoutes({ store, data, pob, extraState = () => ({}) }) {
     // ---------- Bac à sable (espace libre, jamais dans la liste des builds)
     ['post', '/api/sandbox/open', (req) => {
       if (body(req).fromBuild) store.resetSandbox({ fromBuild: store.resolve(body(req).fromBuild).id });
-      else if (body(req).reset) store.resetSandbox({ cls: body(req).class });
+      else if (body(req).reset) store.resetSandbox({ cls: classId(body(req).class) });
       store.setActive(SANDBOX_ID);
       return store.get(SANDBOX_ID);
     }],
-    ['post', '/api/sandbox/reset', (req) => store.resetSandbox({ cls: body(req).class })],
+    ['post', '/api/sandbox/reset', (req) => store.resetSandbox({ cls: classId(body(req).class) })],
     ['post', '/api/sandbox/save', (req) => {
       const b = store.saveSandboxAs(body(req).name);
       if (body(req).activate !== false) store.setActive(b.id);

@@ -8,5 +8,10 @@
   "assets": {
     "directory": "./web/dist-web",
     "binding": "ASSETS"
-  }
+  },
+  // relais entre Claude (connecteur MCP) et l'onglet du site : un par lien personnel
+  "durable_objects": {
+    "bindings": [{ "name": "SESSIONS", "class_name": "SessionClaude" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionClaude"] }]
 }

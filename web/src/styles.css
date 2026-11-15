@@ -578,3 +578,9 @@ body.resizing, body.resizing * { cursor: ew-resize !important; user-select: none
 
 /* le panneau qui affiche une carte passe devant l autre panneau de côté */
 .window:has(.tooltip.card) { z-index: 30; }
+
+/* version en ligne : connexion de Claude */
+.status-dot.wait { background: #f0a030; box-shadow: 0 0 6px #f0a030; animation: pulse 1.4s infinite; }
+.claude-btn { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap; }
+.claude-connect { max-width: 620px; }
+.claude-connect .input.code { font-family: Consolas, monospace; font-size: 12px; }
