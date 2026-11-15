@@ -117,13 +117,34 @@ Exemples : « Crée-moi un Titan orienté Fracas niveau 70 et explique la progre
 scripts/            génération des données (PoB + poe2db + API d'échange FR) et des images
   extract-assets.mjs  textures DDS du jeu -> atlas WebP (web/public/assets)
   build-data.mjs      data/tree.json, gems.json, items.json, translations.json
-src/core/           logique partagée navigateur / serveur (chemins de l'arbre, stats, modèle de build, textes d'objets)
-src/server/         serveur local : API REST, WebSocket temps réel, import/export PoB, stockage des builds
+src/core/           logique partagée navigateur / serveur : arbre, stats, modèle de build, opérations,
+                    stockage des builds (build-store), routes de l'API (build-routes), conversion PoB
+src/server/         serveur local : Express, WebSocket temps réel, fichiers builds/*.json, recherche, glossaire
 src/mcp/server.mjs  serveur MCP pour Claude
-web/                interface React (Vite)
+web/                interface React (Vite) ; web/src/web/ = version en ligne
+functions/          fonctions Cloudflare Pages de la version en ligne (icônes poe2db, liens PoB)
 ```
 
 Mode développement (rechargement à chaud) : `npm run dev`.
+
+## Version en ligne (Cloudflare Pages)
+
+`npm run build:web` construit dans `web/dist-web` une version sans serveur : l'API des builds tourne dans le
+navigateur (mêmes routes que le serveur local) et **chaque visiteur garde ses builds dans son navigateur**
+(localStorage), avec sauvegarde/restauration dans un fichier depuis « Mes builds ». Claude (MCP) n'y est pas
+disponible. Les 4 builds de `builds/` sont proposés en exemple à la première visite.
+
+Réglages du projet Cloudflare Pages (relié au dépôt GitHub) :
+
+| Réglage | Valeur |
+|---|---|
+| Framework preset | `None` |
+| Build command | `npm run build:web` |
+| Build output directory | `web/dist-web` |
+| Root directory | *(vide)* |
+
+Le dossier `functions/` est pris en compte automatiquement. Chaque `git push` sur `main` republie le site.
+Test en local : `npm run build:web` puis `npx wrangler pages dev web/dist-web`.
 
 ## Traductions
 
@@ -142,4 +163,4 @@ Tout est affiché en français. Ordre de priorité : textes officiels du jeu (po
 - API officielle du site d'échange (fr.pathofexile.com) : traduction des modificateurs.
 - [Kami Labs — guide débutant PoE2](https://kami-labs.fr/path-of-exile-2/guide-debutant-path-of-exile-2/) (lien dans l'aide).
 
-Path of Exile 2 et ses images sont la propriété de Grinding Gear Games. Outil non officiel, à usage personnel.
+Path of Exile 2 et ses images sont la propriété de Grinding Gear Games. Outil de fan non officiel, non affilié à Grinding Gear Games.

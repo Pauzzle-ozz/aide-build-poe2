@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { passivePointsForLevel, questPointsForLevel } from '@core/tree-logic.mjs';
-import { api, get, post } from '../api.js';
+import { api, get, post, WEB } from '../api.js';
 import { Modal } from './Window.jsx';
 import { isSandbox, openSandbox, resetSandbox, saveSandbox, leaveSandbox, SANDBOX_ID } from '../sandbox.js';
 import { useLang } from '../lang.jsx';
@@ -197,9 +197,11 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
         <button className={lang === 'fr' ? 'on' : ''} onClick={() => setLang('fr')}>FR</button>
         <button className={lang === 'en' ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
       </div>
-      <div className="row small muted" style={{ whiteSpace: 'nowrap' }} title={connected ? 'Synchronisé en temps réel (Claude peut piloter l\'interface)' : 'Connexion au serveur perdue'}>
-        <span className={`status-dot ${connected ? 'on' : ''}`} /> {connected ? 'En direct' : 'Hors ligne'}
-      </div>
+      {!WEB && (
+        <div className="row small muted" style={{ whiteSpace: 'nowrap' }} title={connected ? 'Synchronisé en temps réel (Claude peut piloter l\'interface)' : 'Connexion au serveur perdue'}>
+          <span className={`status-dot ${connected ? 'on' : ''}`} /> {connected ? 'En direct' : 'Hors ligne'}
+        </div>
+      )}
       {modal === 'import' && <ImportModal onClose={() => setModal(null)} showToast={showToast} setBuild={setBuild} refreshList={refreshList} />}
       {modal === 'export' && <ExportModal onClose={() => setModal(null)} build={build} showToast={showToast} />}
     </div>

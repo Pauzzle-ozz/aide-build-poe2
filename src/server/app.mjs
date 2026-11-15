@@ -5,12 +5,12 @@ import crypto from 'node:crypto';
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import { loadData, norm, matchScore, ROOT, DATA_DIR } from './data.mjs';
-import { BuildStore, SANDBOX_ID } from './store.mjs';
-import { applyOp, resolveNode, resolveGem, resolveClass } from './ops.mjs';
-import { summarizeBuild, normalizeBuild } from '../core/build-model.mjs';
+import { BuildStore } from './store.mjs';
+import { resolveNode, resolveGem, resolveClass } from './ops.mjs';
 import { canSupport } from '../core/gems-logic.mjs';
+import { buildRoutes } from '../core/build-routes.mjs';
 import { makeGlossary } from './glossary.mjs';
-import { decodePobCode, encodePobCode, resolvePobInput, pobXmlToBuild, buildToPobXml, itemFromText } from './pob.mjs';
+import { nodePob } from './pob.mjs';
 
 export async function createApp() {
   const data = loadData();
@@ -19,7 +19,6 @@ export async function createApp() {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
 
-  const summary = (b, lang = 'fr') => summarizeBuild(b, { graph: data.graph, gemsById: data.gemsById, lang });
   const wrap = (fn) => async (req, res) => {
     try {
       const out = await fn(req, res);
@@ -52,94 +51,9 @@ export async function createApp() {
     }
   });
 
-  // ---------- Builds
-  app.get('/api/state', wrap(() => ({
-    activeBuildId: store.state.activeBuildId,
-    sandboxId: SANDBOX_ID,
-    inSandbox: store.state.activeBuildId === SANDBOX_ID,
-    lastBuildId: store.state.lastBuildId,
-    uiClients: clients.size,
-    treeVersion: data.tree.version,
-    root: ROOT,
-  })));
-
-  // ---------- Bac à sable (espace libre, jamais dans la liste des builds)
-  app.post('/api/sandbox/open', wrap((req) => {
-    if (req.body?.fromBuild) store.resetSandbox({ fromBuild: store.resolve(req.body.fromBuild).id });
-    else if (req.body?.reset) store.resetSandbox({ cls: req.body.class });
-    store.setActive(SANDBOX_ID);
-    return store.get(SANDBOX_ID);
-  }));
-  app.post('/api/sandbox/reset', wrap((req) => store.resetSandbox({ cls: req.body?.class })));
-  app.post('/api/sandbox/save', wrap((req) => {
-    const b = store.saveSandboxAs(req.body?.name);
-    if (req.body?.activate !== false) store.setActive(b.id);
-    return b;
-  }));
-  app.post('/api/sandbox/leave', wrap(() => ({ activeBuildId: store.leaveSandbox() })));
-  app.get('/api/builds', wrap(() => store.list()));
-  app.post('/api/builds', wrap((req) => {
-    const b = store.create(req.body || {}, { source: req.body?.source || 'ui' });
-    if (req.body?.activate !== false) store.setActive(b.id);
-    return b;
-  }));
-  app.get('/api/builds/:id', wrap((req) => store.resolve(req.params.id === 'active' ? null : req.params.id)));
-  app.put('/api/builds/:id', wrap((req) => {
-    const b = { ...req.body, id: req.params.id };
-    data.graph.sanitize(b);
-    // build existant : la modification part dans le brouillon (à valider)
-    return store.exists(b.id) ? store.commit(normalizeBuild(b), { source: 'ui' }) : store.add(b, { source: 'ui' });
-  }));
-  app.delete('/api/builds/:id', wrap((req) => {
-    store.remove(req.params.id);
-    return { ok: true, activeBuildId: store.state.activeBuildId };
-  }));
-  app.post('/api/builds/:id/activate', wrap((req) => {
-    const b = store.resolve(req.params.id);
-    store.setActive(b.id);
-    return { ok: true, activeBuildId: b.id };
-  }));
-  app.post('/api/builds/:id/duplicate', wrap((req) => {
-    const b = store.resolve(req.params.id);
-    const copy = store.add({ ...b, id: undefined, name: req.body?.name || `${b.name} (copie)`, createdAt: new Date().toISOString() });
-    store.setActive(copy.id);
-    return copy;
-  }));
-  app.get('/api/builds/:id/summary', wrap((req) => {
-    const b = store.resolve(req.params.id === 'active' ? null : req.params.id);
-    return { ...summary(b, req.query.lang === 'en' ? 'en' : 'fr'), sandbox: b.id === SANDBOX_ID, pending: !!b.pending, pendingChanges: b.pendingChanges || [] };
-  }));
-  // version enregistrée (sans le brouillon)
-  app.get('/api/builds/:id/saved', wrap((req) => store.get(store.resolveId(req.params.id === 'active' ? null : req.params.id))));
-  // « Valider » : le brouillon devient la version enregistrée ; « Annuler » : on jette le brouillon
-  app.post('/api/builds/:id/validate', wrap((req) => store.validate(store.resolveId(req.params.id === 'active' ? null : req.params.id))));
-  app.post('/api/builds/:id/discard', wrap((req) => store.discard(store.resolveId(req.params.id === 'active' ? null : req.params.id))));
-
-  // Opérations (une ou plusieurs) sur un build
-  app.post('/api/builds/:id/ops', wrap((req) => {
-    const b = store.resolve(req.params.id === 'active' ? null : req.params.id);
-    const ops = Array.isArray(req.body?.ops) ? req.body.ops : [req.body];
-    const results = [];
-    for (const op of ops) results.push(applyOp(data, b, op));
-    const w = store.commit(b, { source: req.body?.source || 'ui' });
-    return { build: w, results };
-  }));
-
-  // ---------- PoB
-  app.post('/api/pob/import', wrap(async (req) => {
-    const code = await resolvePobInput(req.body?.code || req.body?.url || '');
-    const xml = code.trim().startsWith('<') ? code : decodePobCode(code);
-    const { build, warnings } = pobXmlToBuild(xml, data, { name: req.body?.name });
-    const saved = store.add(build, { source: req.body?.source || 'ui' });
-    if (req.body?.activate !== false) store.setActive(saved.id);
-    return { build: saved, warnings };
-  }));
-  app.get('/api/builds/:id/pob', wrap((req) => {
-    const b = store.resolve(req.params.id === 'active' ? null : req.params.id);
-    const xml = buildToPobXml(b, data);
-    return { code: encodePobCode(xml), xml: req.query.xml ? xml : undefined };
-  }));
-  app.post('/api/items/parse', wrap((req) => itemFromText(String(req.body?.text || ''), data)));
+  // ---------- Builds, brouillons, bac à sable, PoB, sauvegarde (routes partagées avec la version en ligne)
+  const routes = buildRoutes({ store, data, pob: nodePob, extraState: () => ({ uiClients: clients.size, root: ROOT }) });
+  for (const [method, route, handler] of routes) app[method](route, wrap((req) => handler(req)));
 
   // ---------- Glossaire officiel (mots soulignés dans l'interface)
   app.get('/api/glossary', wrap((req) => (req.query.q ? glossary.search(String(req.query.q), Number(req.query.limit) || 15) : { nombre: glossary.count, termes: glossary.titles() })));

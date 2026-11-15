@@ -10,6 +10,7 @@
     "assets": "node scripts/extract-assets.mjs",
     "dev": "node scripts/dev.mjs",
     "build": "vite build",
+    "build:web": "vite build --mode web",
     "start": "node src/server/index.mjs",
     "mcp": "node src/mcp/server.mjs"
   },

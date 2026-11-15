@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TreeGraph } from '@core/tree-logic.mjs';
-import { api, get, post, connectWs } from './api.js';
+import { api, get, post, connectWs, WEB } from './api.js';
 import TreeView from './components/TreeView.jsx';
 import TopBar from './components/TopBar.jsx';
 import Markdown from './components/Markdown.jsx';
@@ -21,8 +21,31 @@ const PANELS = [
   { id: 'stats', key: 'C', label: 'Personnage', side: 'left' },
   { id: 'notes', key: 'N', label: 'Notes', side: 'right' },
   { id: 'library', key: 'B', label: 'Bibliothèque', side: 'center' },
-  { id: 'help', key: '?', label: 'Aide & Claude', side: 'center' },
+  { id: 'help', key: '?', label: WEB ? 'Aide' : 'Aide & Claude', side: 'center' },
 ];
+
+/** Version en ligne : messages affichés à l'arrivée (première visite, mémoire du navigateur bloquée) */
+function webNotices(state) {
+  const out = [];
+  if (state.persistent === false) {
+    out.push({
+      id: 'memoire',
+      title: 'Attention : rien ne sera gardé',
+      text: "Votre navigateur bloque l'enregistrement pour ce site (navigation privée ou cookies refusés) : vos builds seront **perdus en fermant la page**. Avant de partir, téléchargez une sauvegarde dans « Mes builds » (touche M).",
+    });
+  } else if (state.firstVisit) {
+    out.push({
+      id: 'bienvenue',
+      title: 'Bienvenue',
+      text: [
+        'Vos builds sont enregistrés **dans ce navigateur, sur cet appareil** : ils vous attendent à votre prochaine visite, sans compte à créer.',
+        "Quatre builds d'exemple (Moine Foudre, du niveau 1 au niveau 90) sont déjà dans « Mes builds » (touche M) : modifiez-les ou supprimez-les librement.",
+        "Pour ne rien perdre, téléchargez de temps en temps une sauvegarde (« Mes builds » → « Télécharger une sauvegarde »). L'aide (touche H) explique le reste.",
+      ].join('\n\n'),
+    });
+  }
+  return out;
+}
 
 export default function App() {
   const [raw, setRaw] = useState(null);
@@ -76,6 +99,7 @@ export default function App() {
         setRaw({ tree, graph, gems, gemsById, items, sprites, glossary });
         setBuilds(list);
         setBuild(await get(`/api/builds/${state.activeBuildId}`));
+        if (state.web) setMessages(webNotices(state));
       } catch (e) {
         setError(String(e.message || e));
       }
@@ -175,7 +199,11 @@ export default function App() {
       <div style={{ padding: 40 }}>
         <h2 style={{ fontFamily: 'var(--font-title)', color: 'var(--gold-2)' }}>Impossible de charger les données</h2>
         <p>{error}</p>
-        <p className="muted">Lancez <code>npm run setup</code> dans le dossier du projet, puis <code>npm start</code>.</p>
+        {WEB ? (
+          <p className="muted">Vérifiez votre connexion à Internet, puis rechargez la page.</p>
+        ) : (
+          <p className="muted">Lancez <code>npm run setup</code> dans le dossier du projet, puis <code>npm start</code>.</p>
+        )}
       </div>
     );
   }

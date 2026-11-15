@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Window from '../components/Window.jsx';
 import Markdown from '../components/Markdown.jsx';
 import { GemIcon } from './SkillsPanel.jsx';
-import { api, get, post, img } from '../api.js';
+import { api, get, post, img, WEB } from '../api.js';
 import { summarizeBuild } from '@core/build-model.mjs';
 import { useLang } from '../lang.jsx';
 import { SANDBOX_ID, openSandbox, saveSandbox } from '../sandbox.js';
@@ -91,6 +91,39 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
     refreshList();
   };
 
+  // --- sauvegarde de tous les builds dans un fichier, et restauration
+  const fileRef = useRef(null);
+  const downloadBackup = async () => {
+    try {
+      const backup = await get('/api/backup');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+      a.download = `builds-poe2-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      showToast(`Sauvegarde téléchargée : ${backup.builds.length} build(s).`);
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  };
+  const restoreBackup = async (file) => {
+    if (!file) return;
+    try {
+      let content;
+      try {
+        content = JSON.parse(await file.text());
+      } catch {
+        throw new Error("Ce fichier n'est pas une sauvegarde de builds.");
+      }
+      const r = await post('/api/backup/restore', content);
+      refreshList();
+      if (r.added) showToast(`${r.added} build(s) restauré(s)${r.skipped ? ` (${r.skipped} déjà présent(s))` : ''}.`);
+      else showToast('Rien à restaurer : ces builds sont déjà là.');
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  };
+
   return (
     <Window title="Mes builds" side="center" onClose={onClose}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 0.8fr) minmax(320px, 1.4fr)', gap: 14, minHeight: 0 }}>
@@ -104,7 +137,16 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
               <div className="sub">Mode libre, hors de vos builds</div>
             </div>
           </div>
-          <div className="small muted" style={{ margin: '6px 0' }}>{builds.length} build(s) enregistré(s)</div>
+          <div className="small muted" style={{ margin: '6px 0' }}>{builds.length} build(s) enregistré(s){WEB ? ' dans ce navigateur' : ''}</div>
+          <div className="row wrap" style={{ gap: 6, marginBottom: 8 }}>
+            <button className="btn small" onClick={downloadBackup} title="Enregistre tous vos builds dans un fichier : gardez-le pour ne rien perdre, ou ouvrez-le sur un autre appareil">
+              Télécharger une sauvegarde
+            </button>
+            <button className="btn small" onClick={() => fileRef.current?.click()} title="Ajoute les builds d'un fichier de sauvegarde (aucun build existant n'est écrasé)">
+              Restaurer une sauvegarde
+            </button>
+            <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={(e) => { restoreBackup(e.target.files?.[0]); e.target.value = ''; }} />
+          </div>
           {groups.map(([cls, list]) => (
             <div key={cls}>
               <div className="section-title">{cls}</div>

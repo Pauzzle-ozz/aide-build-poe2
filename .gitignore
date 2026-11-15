@@ -8,3 +8,5 @@ builds/_bac-a-sable.json
 builds/_brouillon-*.json
 .claude/expert-build-poe2-workspace/
 .claude/settings.local.json
+web/dist-web/
+.wrangler/
