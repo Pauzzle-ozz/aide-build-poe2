@@ -1,0 +1,12 @@
+// Version en ligne sur Cloudflare Workers (adresse gratuite *.workers.dev).
+// Dans le tableau de bord : Build command = npm run build:web, Deploy command = npx wrangler deploy.
+// Le nom du Worker dans le tableau de bord doit être le même que « name » ci-dessous.
+{
+  "name": "aide-build-poe2",
+  "main": "cloudflare/worker.mjs",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./web/dist-web",
+    "binding": "ASSETS"
+  }
+}

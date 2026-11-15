@@ -122,29 +122,26 @@ src/core/           logique partagée navigateur / serveur : arbre, stats, modè
 src/server/         serveur local : Express, WebSocket temps réel, fichiers builds/*.json, recherche, glossaire
 src/mcp/server.mjs  serveur MCP pour Claude
 web/                interface React (Vite) ; web/src/web/ = version en ligne
-functions/          fonctions Cloudflare Pages de la version en ligne (icônes poe2db, liens PoB)
+cloudflare/         Worker de la version en ligne (icônes poe2db, liens PoB) ; functions/ = même chose pour Pages
 ```
 
 Mode développement (rechargement à chaud) : `npm run dev`.
 
-## Version en ligne (Cloudflare Pages)
+## Version en ligne (Cloudflare)
 
 `npm run build:web` construit dans `web/dist-web` une version sans serveur : l'API des builds tourne dans le
 navigateur (mêmes routes que le serveur local) et **chaque visiteur garde ses builds dans son navigateur**
 (localStorage), avec sauvegarde/restauration dans un fichier depuis « Mes builds ». Claude (MCP) n'y est pas
 disponible. Les 4 builds de `builds/` sont proposés en exemple à la première visite.
 
-Réglages du projet Cloudflare Pages (relié au dépôt GitHub) :
+**Cloudflare Workers** (méthode conseillée, configuration dans `wrangler.jsonc`, code dans `cloudflare/`) :
+projet relié au dépôt GitHub, nom `aide-build-poe2` (le même que dans `wrangler.jsonc`), Build command
+`npm run build:web`, Deploy command `npx wrangler deploy`, Path `/`.
 
-| Réglage | Valeur |
-|---|---|
-| Framework preset | `None` |
-| Build command | `npm run build:web` |
-| Build output directory | `web/dist-web` |
-| Root directory | *(vide)* |
+**Cloudflare Pages** (autre possibilité, via le dossier `functions/`) : Framework preset `None`, Build command
+`npm run build:web`, Build output directory `web/dist-web`.
 
-Le dossier `functions/` est pris en compte automatiquement. Chaque `git push` sur `main` republie le site.
-Test en local : `npm run build:web` puis `npx wrangler pages dev web/dist-web`.
+Chaque `git push` sur `main` republie le site. Test en local : `npm run build:web` puis `npx wrangler dev`.
 
 ## Traductions
 
