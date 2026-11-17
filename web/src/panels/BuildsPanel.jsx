@@ -6,6 +6,9 @@ import { api, get, post, img, WEB } from '../api.js';
 import { summarizeBuild } from '@core/build-model.mjs';
 import { useLang } from '../lang.jsx';
 import { SANDBOX_ID, openSandbox, saveSandbox } from '../sandbox.js';
+import { useIsMobile } from '../mobile.js';
+import { pressable } from '../a11y.js';
+import { useDialog } from '../components/Dialog.jsx';
 
 const RARITY_COLOR = { UNIQUE: '#cf8a4a', RARE: 'var(--rare)', MAGIC: 'var(--magic)', NORMAL: 'var(--normal)' };
 
@@ -13,8 +16,23 @@ const RARITY_COLOR = { UNIQUE: '#cf8a4a', RARE: 'var(--rare)', MAGIC: 'var(--mag
 export default function BuildsPanel({ data, build, builds, onClose, openPanel, setFocusCmd, setHighlight, refreshList, setBuild, showToast }) {
   const { graph } = data;
   const [q, setQ] = useState('');
-  const [selId, setSelId] = useState(build.id);
+  const [selId, setSelIdState] = useState(build.id);
   const [sel, setSel] = useState(null);
+  // téléphone : liste puis détail l'un sous l'autre ; choisir un build fait défiler jusqu'à son détail
+  const mobile = useIsMobile();
+  const dialog = useDialog();
+  const detailRef = useRef(null);
+  const scrollToDetail = useRef(false);
+  const setSelId = (id, fromList = false) => {
+    scrollToDetail.current = fromList && mobile;
+    setSelIdState(id);
+  };
+  useEffect(() => {
+    if (sel && scrollToDetail.current) {
+      scrollToDetail.current = false;
+      detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [sel]);
 
   useEffect(() => {
     refreshList();
@@ -59,7 +77,7 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
     } else if (panel) openPanel(panel);
   };
   const remove = async () => {
-    if (!confirm(`Supprimer définitivement le build « ${sel.name} » ?`)) return;
+    if (!(await dialog.confirm(`Supprimer définitivement le build « ${sel.name} » ?`, { title: 'Supprimer le build', okLabel: 'Supprimer', danger: true }))) return;
     const r = await api('DELETE', `/api/builds/${sel.id}`);
     if (sel.id === build.id) setBuild(await get(`/api/builds/${r.activeBuildId}`));
     setSelId(r.activeBuildId);
@@ -70,14 +88,14 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
   const testInSandbox = async () => {
     const sb = await get(`/api/builds/${SANDBOX_ID}`).catch(() => null);
     const hasContent = sb && (sb.tree.nodes.length || sb.skills.length || Object.keys(sb.items).length);
-    if (hasContent && !confirm('Le bac à sable contient déjà des essais : les remplacer par une copie de ce build ?')) return;
+    if (hasContent && !(await dialog.confirm('Le bac à sable contient déjà des essais : les remplacer par une copie de ce build ?', { title: 'Bac à sable', okLabel: 'Remplacer', danger: true }))) return;
     const b = await openSandbox({ fromBuild: sel.id });
     setBuild(b);
     setSelId(SANDBOX_ID);
     showToast(`Copie de « ${sel.name} » dans le bac à sable : l'original reste intact.`);
   };
   const saveSb = async () => {
-    const name = prompt('Nom du nouveau build :', 'Nouveau build');
+    const name = await dialog.prompt('Nom du nouveau build :', 'Nouveau build', { title: 'Enregistrer comme build', okLabel: 'Enregistrer' });
     if (!name) return;
     const b = await saveSandbox(name);
     setBuild(b);
@@ -126,10 +144,10 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
 
   return (
     <Window title="Mes builds" side="center" onClose={onClose}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 0.8fr) minmax(320px, 1.4fr)', gap: 14, minHeight: 0 }}>
-        <div style={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
-          <input className="input" style={{ width: '100%', marginBottom: 8 }} placeholder="Rechercher un build…" value={q} onChange={(e) => setQ(e.target.value)} />
-          <div className={`result sb-entry ${selId === SANDBOX_ID ? 'on' : ''}`} onClick={() => setSelId(SANDBOX_ID)}>
+      <div className="builds-layout">
+        <div className="builds-list">
+          <input className="input" style={{ width: '100%', marginBottom: 8 }} aria-label="Rechercher un build" placeholder="Rechercher un build…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <div className={`result sb-entry ${selId === SANDBOX_ID ? 'on' : ''}`} {...pressable(() => setSelId(SANDBOX_ID, true), { 'aria-pressed': selId === SANDBOX_ID })}>
             <div style={{ flex: 1 }}>
               <div className="title" style={{ color: '#9fe0c0' }}>
                 Bac à sable {build.id === SANDBOX_ID && <span className="tag" style={{ color: '#9fe0c0', borderColor: '#3f6f5a' }}>ouvert</span>}
@@ -153,7 +171,7 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
               {list.map((b) => {
                 const a = b.ascendancy && graph.ascById[b.ascendancy];
                 return (
-                  <div key={b.id} className={`result ${selId === b.id ? 'on' : ''}`} onClick={() => setSelId(b.id)}>
+                  <div key={b.id} className={`result ${selId === b.id ? 'on' : ''}`} {...pressable(() => setSelId(b.id, true), { 'aria-pressed': selId === b.id })}>
                     <div style={{ flex: 1 }}>
                       <div className="title">
                         {b.name} {b.id === build.id && <span className="tag" style={{ color: 'var(--gold-2)', borderColor: 'var(--gold-dim)' }}>ouvert</span>}{b.pending && <span className="tag pending">non validé</span>}
@@ -170,7 +188,7 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
           {!groups.length && <div className="empty">Aucun build.</div>}
         </div>
 
-        <div style={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto', paddingRight: 4 }}>
+        <div className="builds-detail" ref={detailRef}>
           {!summary ? (
             <div className="empty">Choisissez un build dans la liste.</div>
           ) : (
@@ -247,7 +265,7 @@ export default function BuildsPanel({ data, build, builds, onClose, openPanel, s
               {summary.items.map((it) => (
                 <div key={it.slot} className="row" style={{ marginBottom: 4 }}>
                   {sel.items[it.slot]?.iconUrl && <img className="thumb" src={img(sel.items[it.slot].iconUrl)} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />}
-                  <span className="muted small" style={{ minWidth: 110 }}>{it.slotLabel}</span>
+                  <span className="muted small" style={{ minWidth: mobile ? 84 : 110 }}>{it.slotLabel}</span>
                   <span style={{ color: RARITY_COLOR[it.rarity] }}>{it.name}</span>
                   {it.base && it.base !== it.name && <span className="muted small">({it.base})</span>}
                 </div>

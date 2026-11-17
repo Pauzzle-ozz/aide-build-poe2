@@ -5,6 +5,7 @@ import { GemIcon } from './SkillsPanel.jsx';
 import { img } from '../api.js';
 import { gemClassLabel } from '../gem-classes.js';
 import { SLOT_LABEL } from '@core/build-model.mjs';
+import { pressable } from '../a11y.js';
 import { passiveSections, gemSections, uniqueSections, baseSections, THEMES, itemLevel, defenceLabel } from '../library-sections.js';
 
 const TABS = [
@@ -104,7 +105,7 @@ export default function LibraryPanel({ data, build, doOps, onClose, setFocusCmd,
             {label}
           </button>
         ))}
-        <input className="input grow" style={{ minWidth: 200 }} placeholder="Filtrer (nom, effet, mot-clé…)" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="input grow" style={{ minWidth: 180 }} aria-label="Filtrer la bibliothèque" placeholder="Filtrer (nom, effet, mot-clé…)" value={q} onChange={(e) => setQ(e.target.value)} />
         {tab === 'passives' && (
           <select className="input" value={theme} onChange={(e) => setTheme(e.target.value)} title="Thème des passifs">
             {THEMES.map(([k]) => <option key={k} value={k}>{k === 'all' ? 'Tous les thèmes' : k}</option>)}
@@ -121,7 +122,7 @@ export default function LibraryPanel({ data, build, doOps, onClose, setFocusCmd,
               return (
                 <div key={s.id}>
                   {s.id === firstCommon && <div className="lib-nav-sep">Communs à toutes les classes</div>}
-                  <div className={`lib-nav-h ${s.common ? 'common' : ''}`} onClick={() => goTo(s.id)}>
+                  <div className={`lib-nav-h ${s.common ? 'common' : ''}`} {...pressable(() => goTo(s.id))}>
                     {s.title} <span className="cnt">{s.total}</span>
                   </div>
                 </div>
@@ -134,7 +135,7 @@ export default function LibraryPanel({ data, build, doOps, onClose, setFocusCmd,
             return (
               <div key={s.id}>
                 {group && group !== prevGroup && <div className="lib-nav-g">{group}</div>}
-                <div className={`lib-nav-i ${group ? 'sub' : ''}`} onClick={() => goTo(s.id)}>
+                <div className={`lib-nav-i ${group ? 'sub' : ''}`} {...pressable(() => goTo(s.id))}>
                   {group ? s.title.split(' — ')[1] : s.title} <span className="cnt">{s.items.length}</span>
                 </div>
               </div>
@@ -154,8 +155,8 @@ export default function LibraryPanel({ data, build, doOps, onClose, setFocusCmd,
               </div>
             ) : (
               <div key={s.id} id={`lib-${s.id}`} className="lib-sec">
-                <div className="lib-h2" onClick={() => setClosed((c) => ({ ...c, [s.id]: !c[s.id] }))}>
-                  <span className="arrow">{closed[s.id] ? '▸' : '▾'}</span> {s.title}
+                <div className="lib-h2" {...pressable(() => setClosed((c) => ({ ...c, [s.id]: !c[s.id] })), { 'aria-expanded': !closed[s.id] })}>
+                  <span className="arrow" aria-hidden="true">{closed[s.id] ? '▸' : '▾'}</span> {s.title}
                   <span className="cnt">{s.items.length}</span>
                   {s.hint && <span className="h">{s.hint}</span>}
                 </div>
@@ -171,8 +172,13 @@ export default function LibraryPanel({ data, build, doOps, onClose, setFocusCmd,
           )}
         </div>
 
-        {/* Détails */}
-        <div className="lib-detail">
+        {/* Détails (sur téléphone : fiche en bas de l'écran, par-dessus la liste) */}
+        <div className={`lib-detail ${sel ? 'open' : ''}`}>
+          {sel && (
+            <button className="sheet-close lib-detail-close" aria-label="Fermer la fiche" onClick={() => setSel(null)}>
+              ✕
+            </button>
+          )}
           {!sel ? (
             <div className="empty">
               Choisissez un élément.
@@ -193,7 +199,7 @@ function Entry({ tab, it, graph, dist, on, onClick }) {
   if (tab === 'passives') {
     const d = dist?.get(it.id);
     return (
-      <div className={`lib-entry ${on ? 'on' : ''} t-${it.type}`} onClick={onClick}>
+      <div className={`lib-entry ${on ? 'on' : ''} t-${it.type}`} {...pressable(onClick, { 'aria-pressed': on })}>
         <div className="title">
           {it.name}
           {it.copies > 1 && <span className="muted small"> ×{it.copies}</span>}
@@ -205,7 +211,7 @@ function Entry({ tab, it, graph, dist, on, onClick }) {
   }
   if (tab === 'gems') {
     return (
-      <div className={`lib-entry ${on ? 'on' : ''}`} onClick={onClick}>
+      <div className={`lib-entry ${on ? 'on' : ''}`} {...pressable(onClick, { 'aria-pressed': on })}>
         <GemIcon gem={it} support={it.kind === 'support' || it.kind === 'lineage'} />
         <div style={{ minWidth: 0 }}>
           <div className={`title gem-${it.color}`}>{it.name}</div>
@@ -216,7 +222,7 @@ function Entry({ tab, it, graph, dist, on, onClick }) {
   }
   const unique = tab === 'uniques';
   return (
-    <div className={`lib-entry ${on ? 'on' : ''}`} onClick={onClick}>
+    <div className={`lib-entry ${on ? 'on' : ''}`} {...pressable(onClick, { 'aria-pressed': on })}>
       {it.iconUrl && <img className="thumb" src={img(it.iconUrl)} alt="" loading="lazy" />}
       <div style={{ minWidth: 0 }}>
         <div className="title" style={{ color: unique ? '#cf8a4a' : undefined }}>{it.name}</div>

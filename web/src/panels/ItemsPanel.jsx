@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Window from '../components/Window.jsx';
 import { ItemTooltip } from '../components/Tooltips.jsx';
 import { useHoverCard } from '../components/HoverCard.jsx';
+import { useIsMobile } from '../mobile.js';
+import { pressable } from '../a11y.js';
 
 // la carte d'un objet se colle au bord gauche du panneau (elle ne cache plus l'équipement) et suit la souris en hauteur
 const panelEdge = (e) => e.currentTarget.closest('.window')?.getBoundingClientRect().left ?? e.clientX;
@@ -42,25 +44,30 @@ export default function ItemsPanel({ data, build, doOps, onClose, selectedSlot, 
   const [picker, setPicker] = useState(null);
   const slot = selectedSlot && LAYOUT[selectedSlot] ? selectedSlot : null;
   const item = slot ? build.items[slot] : null;
+  // téléphone : le détail de l'emplacement choisi est sous l'inventaire, on l'amène à l'écran
+  const mobile = useIsMobile();
+  const detailRef = useRef(null);
+  useEffect(() => {
+    if (mobile && (slot || picker)) detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [slot, picker, mobile]);
 
   return (
     <Window title="Équipement" side="right" onClose={onClose}>
-      <div
-        className="equip-grid"
-        style={{ gridTemplateColumns: 'repeat(8, 1fr)', gridTemplateRows: 'repeat(8, 50px)', gridAutoRows: 'unset' }}
-      >
+      <div className="equip-grid inv">
         {Object.entries(LAYOUT).map(([id, [c, r, w, h]]) => {
           const it = build.items[id];
           return (
             <div
               key={id}
+              {...pressable(
+                () => {
+                  setSelectedSlot(id);
+                  setPicker(it ? null : id);
+                },
+                { 'aria-label': `${SLOT_LABEL[id]}${it ? ` : ${it.name}` : ' (vide)'}`, 'aria-pressed': slot === id },
+              )}
               className={`slot ${it ? RAR[it.rarity] || '' : ''} ${slot === id ? 'selected' : ''}`}
               style={{ gridColumn: `${c} / span ${w}`, gridRow: `${r} / span ${h}` }}
-              onClick={() => {
-                setSelectedSlot(id);
-                if (!it) setPicker(id);
-                else setPicker(null);
-              }}
               onMouseEnter={(e) => it && hc.show(id, it, panelEdge(e), e.clientY, { dock: 'left' })}
               onMouseMove={(e) => it && hc.follow(id, panelEdge(e), e.clientY)}
               onMouseLeave={hc.hide}
@@ -73,6 +80,7 @@ export default function ItemsPanel({ data, build, doOps, onClose, selectedSlot, 
       </div>
       {hc.card && build.items[hc.card.key] && <ItemTooltip key={hc.card.key} item={build.items[hc.card.key]} x={hc.card.x} y={hc.card.y} card={hc.cardProps} buildItem />}
 
+      <div ref={detailRef} style={{ scrollMarginTop: 8 }} />
       {slot && (
         <>
           <div className="section-title">{SLOT_LABEL[slot]}</div>
@@ -101,6 +109,7 @@ function ItemPicker({ data, slot, doOps, onDone, showToast }) {
   const hc = useHoverCard();
   const [rare, setRare] = useState({ base: null, name: '', rarity: 'RARE', mods: '' });
   const [text, setText] = useState('');
+  const mobile = useIsMobile(); // pas de clavier qui surgit tout seul sur téléphone
   const list = useMemo(() => {
     const src = tab === 'base' ? data.items.bases : data.items.uniques;
     const n = q.trim().toLowerCase();
@@ -141,7 +150,7 @@ function ItemPicker({ data, slot, doOps, onDone, showToast }) {
               <option value="MAGIC">Magique</option>
               <option value="NORMAL">Normal</option>
             </select>
-            <input className="input grow" placeholder="Nom de l'objet (ex : Fléau des Tempêtes)" value={rare.name} onChange={(e) => setRare({ ...rare, name: e.target.value })} />
+            <input className="input grow" style={{ minWidth: 0 }} placeholder="Nom de l'objet (ex : Fléau des Tempêtes)" value={rare.name} onChange={(e) => setRare({ ...rare, name: e.target.value })} />
           </div>
           <textarea className="input" style={{ width: '100%', minHeight: 110, marginTop: 6 }} placeholder={'Un modificateur par ligne, ex :\n+80 de Vie maximale\n+35% de Résistance au feu'} value={rare.mods} onChange={(e) => setRare({ ...rare, mods: e.target.value })} />
           <div className="row" style={{ justifyContent: 'space-between', marginTop: 6 }}>
@@ -151,23 +160,35 @@ function ItemPicker({ data, slot, doOps, onDone, showToast }) {
         </div>
       ) : (
         <>
-          <input className="input" style={{ width: '100%' }} placeholder={tab === 'unique' ? 'Rechercher un unique (nom ou effet)…' : 'Rechercher une base…'} value={q} onChange={(e) => setQ(e.target.value)} autoFocus />
+          <input className="input" style={{ width: '100%' }} placeholder={tab === 'unique' ? 'Rechercher un unique (nom ou effet)…' : 'Rechercher une base…'} value={q} onChange={(e) => setQ(e.target.value)} autoFocus={!mobile} />
           <div className="result-list" style={{ marginTop: 6 }}>
             {list.length === 0 && <div className="empty">Aucun objet trouvé pour cet emplacement.</div>}
             {list.map((it) => (
               <div
                 key={it.id}
                 className="result"
-                onClick={() => (tab === 'unique' ? equip({ unique: it.id }) : setRare({ ...rare, base: it }))}
+                {...pressable(() => (tab === 'unique' ? equip({ unique: it.id }) : setRare({ ...rare, base: it })))}
                 onMouseEnter={(e) => hc.show(it.id, tab === 'unique' ? { ...it, rarity: 'UNIQUE', implicitsFr: it.implicits, explicitsFr: it.explicits } : { ...it, rarity: 'NORMAL' }, panelEdge(e), e.clientY, { dock: 'left' })}
                 onMouseMove={(e) => hc.follow(it.id, panelEdge(e), e.clientY)}
                 onMouseLeave={hc.hide}
               >
                 {it.iconUrl && <img className="thumb" src={img(it.iconUrl)} alt="" loading="lazy" />}
-                <div>
+                <div className="grow" style={{ minWidth: 0 }}>
                   <div className="title" style={{ color: tab === 'unique' ? '#cf8a4a' : undefined }}>{it.name}</div>
                   <div className="sub">{tab === 'unique' ? it.base : it.classFr} {it.requirements?.[0] ? `· ${it.requirements[0]}` : ''}</div>
                 </div>
+                {mobile && tab === 'unique' && (
+                  <button
+                    className="btn small ghost info-btn"
+                    aria-label={`Voir la carte de ${it.name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      hc.open(it.id, { ...it, rarity: 'UNIQUE', implicitsFr: it.implicits, explicitsFr: it.explicits });
+                    }}
+                  >
+                    Voir
+                  </button>
+                )}
               </div>
             ))}
           </div>

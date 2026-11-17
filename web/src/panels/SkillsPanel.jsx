@@ -8,6 +8,11 @@ const panelEdge = (e) => e.currentTarget.closest('.window')?.getBoundingClientRe
 import { img } from '../api.js';
 import { canSupport, checkSkills } from '@core/gems-logic.mjs';
 import { classFilters, gemMatchesClass, classRank } from '../gem-classes.js';
+import { isTouchInput, useIsMobile } from '../mobile.js';
+import { pressable } from '../a11y.js';
+
+/** Au doigt, toucher une gemme ouvre sa carte (sauf sur les champs et boutons de la ligne) */
+const tapOpens = (e) => isTouchInput() && !e.target.closest('button, input, select, textarea');
 
 const KIND_FR = { skill: "Gemme d'aptitude", support: 'Gemme de soutien', spirit: "Gemme d'esprit", meta: 'Méta-gemme', lineage: 'Soutien de lignage' };
 
@@ -22,6 +27,7 @@ export default function SkillsPanel({ data, build, doOps, onClose }) {
     onMouseEnter: (e) => gem && hc.show(key, { gem, level }, panelEdge(e), e.clientY, { dock: 'right' }),
     onMouseMove: (e) => hc.follow(key, panelEdge(e), e.clientY),
     onMouseLeave: hc.hide,
+    onClick: (e) => gem && tapOpens(e) && hc.open(key, { gem, level }),
   });
 
   const warnings = checkSkills(build, data.gemsById);
@@ -45,10 +51,10 @@ export default function SkillsPanel({ data, build, doOps, onClose }) {
                 defaultValue={s.label}
                 onBlur={(e) => e.target.value !== (s.label || '') && doOps({ op: 'updateSkill', skillId: s.id, label: e.target.value })}
               />
-              <button className="btn small ghost" title="Monter" onClick={() => doOps({ op: 'moveSkill', skillId: s.id, delta: -1 })}>▲</button>
-              <button className="btn small ghost" title="Descendre" onClick={() => doOps({ op: 'moveSkill', skillId: s.id, delta: 1 })}>▼</button>
-              <button className="btn small ghost" title={s.enabled === false ? 'Activer' : 'Désactiver'} onClick={() => doOps({ op: 'updateSkill', skillId: s.id, enabled: s.enabled === false })}>{s.enabled === false ? '○' : '●'}</button>
-              <button className="btn small danger ghost" title="Supprimer" onClick={() => doOps({ op: 'removeSkill', skillId: s.id })}>✕</button>
+              <button className="btn small ghost" title="Monter" aria-label="Monter la compétence" onClick={() => doOps({ op: 'moveSkill', skillId: s.id, delta: -1 })}>▲</button>
+              <button className="btn small ghost" title="Descendre" aria-label="Descendre la compétence" onClick={() => doOps({ op: 'moveSkill', skillId: s.id, delta: 1 })}>▼</button>
+              <button className="btn small ghost" title={s.enabled === false ? 'Activer' : 'Désactiver'} aria-label={s.enabled === false ? 'Activer la compétence' : 'Désactiver la compétence'} onClick={() => doOps({ op: 'updateSkill', skillId: s.id, enabled: s.enabled === false })}>{s.enabled === false ? '○' : '●'}</button>
+              <button className="btn small danger ghost" title="Supprimer" aria-label="Supprimer la compétence" onClick={() => doOps({ op: 'removeSkill', skillId: s.id })}>✕</button>
             </div>
             {s.gems.map((g, gi) => {
               const gd = data.gemsById.get(g.gemId);
@@ -60,16 +66,17 @@ export default function SkillsPanel({ data, build, doOps, onClose }) {
                   <span className={`gname gem-${gd?.color || 'none'}`}>{gd?.name || g.gemId}{ws.length > 0 && <span className="warn-badge"> ⚠</span>}</span>
                   <span className="small muted">niv.</span>
                   <input
-                    className="input small"
+                    className="input small gem-level"
                     type="number"
+                    inputMode="numeric"
                     min={1}
                     max={40}
-                    style={{ width: 52 }}
+                    aria-label={`Niveau de ${gd?.name || 'la gemme'}`}
                     value={g.level}
                     onChange={(e) => updateGems(s, s.gems.map((x, i) => (i === gi ? { ...x, level: Number(e.target.value) } : x)))}
                   />
-                  <button className="btn small ghost" title={g.enabled === false ? 'Activer' : 'Désactiver'} onClick={() => updateGems(s, s.gems.map((x, i) => (i === gi ? { ...x, enabled: x.enabled === false } : x)))}>{g.enabled === false ? '○' : '●'}</button>
-                  <button className="btn small ghost" title="Retirer" onClick={() => (s.gems.length === 1 ? doOps({ op: 'removeSkill', skillId: s.id }) : updateGems(s, s.gems.filter((_, i) => i !== gi)))}>✕</button>
+                  <button className="btn small ghost" title={g.enabled === false ? 'Activer' : 'Désactiver'} aria-label={g.enabled === false ? 'Activer la gemme' : 'Désactiver la gemme'} onClick={() => updateGems(s, s.gems.map((x, i) => (i === gi ? { ...x, enabled: x.enabled === false } : x)))}>{g.enabled === false ? '○' : '●'}</button>
+                  <button className="btn small ghost" title="Retirer" aria-label="Retirer la gemme" onClick={() => (s.gems.length === 1 ? doOps({ op: 'removeSkill', skillId: s.id }) : updateGems(s, s.gems.filter((_, i) => i !== gi)))}>✕</button>
                 </div>
               );
             })}
@@ -104,6 +111,7 @@ export function GemPicker({ data, kind, active, exclude = [], onPick, onCancel, 
   const [cls, setCls] = useState(kind === 'support' ? 'all' : buildClass || 'all');
   const [color, setColor] = useState('all');
   const hc = useHoverCard();
+  const mobile = useIsMobile();
   const list = useMemo(() => {
     const n = q.trim().toLowerCase();
     return data.gems
@@ -117,9 +125,9 @@ export function GemPicker({ data, kind, active, exclude = [], onPick, onCancel, 
       .slice(0, 200);
   }, [q, k, data, exclude, active, cls, color, buildClass]);
   return (
-    <div style={{ margin: '8px 0', border: '1px solid var(--line)', padding: 8, background: '#0b0907' }}>
-      <div className="row" style={{ marginBottom: 6 }}>
-        <input className="input grow" autoFocus placeholder={k === 'support' ? 'Rechercher un soutien (nom, mot-clé, effet)…' : 'Rechercher une gemme (nom, mot-clé)…'} value={q} onChange={(e) => setQ(e.target.value)} />
+    <div className="gem-picker">
+      <div className="row wrap" style={{ marginBottom: 6 }}>
+        <input className="input grow" style={{ minWidth: 180 }} autoFocus={!mobile} placeholder={k === 'support' ? 'Rechercher un soutien (nom, mot-clé, effet)…' : 'Rechercher une gemme (nom, mot-clé)…'} value={q} onChange={(e) => setQ(e.target.value)} />
         {kind !== 'support' && (
           <>
             <select className="input" value={cls} onChange={(e) => setCls(e.target.value)} title="Classe associée (catégories officielles du jeu)">
@@ -142,21 +150,33 @@ export function GemPicker({ data, kind, active, exclude = [], onPick, onCancel, 
         <button className="btn small ghost" onClick={onCancel}>Annuler</button>
       </div>
       {k === 'support' && active && <div className="small muted" style={{ marginBottom: 4 }}>Les soutiens sont communs à toutes les classes. Seuls ceux compatibles avec « {active.name} » sont proposés (règles de Path of Building).</div>}
-      <div className="result-list" style={{ maxHeight: 320, overflow: 'auto' }}>
+      <div className="result-list gem-picker-list">
         {list.map((g) => (
           <div
             key={g.id}
             className="result"
-            onClick={() => onPick(g)}
+            {...pressable(() => onPick(g))}
             onMouseEnter={(e) => hc.show(g.id, g, panelEdge(e), e.clientY, { dock: 'right' })}
             onMouseMove={(e) => hc.follow(g.id, panelEdge(e), e.clientY)}
             onMouseLeave={hc.hide}
           >
             <GemIcon gem={g} support={g.kind === 'support'} />
-            <div>
+            <div className="grow" style={{ minWidth: 0 }}>
               <div className={`title gem-${g.color}`}>{g.name}</div>
               <div className="sub">{g.tier ? `Palier ${g.tier} · ` : ''}{k === 'support' ? '' : `${g.category} · `}{g.tags.join(', ')}</div>
             </div>
+            {mobile && (
+              <button
+                className="btn small ghost info-btn"
+                aria-label={`Voir la carte de ${g.name}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  hc.open(g.id, g);
+                }}
+              >
+                Voir
+              </button>
+            )}
           </div>
         ))}
         {list.length === 0 && <div className="empty">Aucune gemme trouvée.</div>}

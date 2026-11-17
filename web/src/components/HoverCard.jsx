@@ -4,7 +4,10 @@
 // - un clic sur la carte la BLOQUE : elle reste ouverte, même en survolant autre chose ;
 // - un clic en dehors (ou Échap) la ferme. Ce premier clic ne fait rien d'autre, pour ne pas
 //   allouer un passif ou changer d'objet par mégarde.
+// Au doigt (téléphone), il n'y a pas de survol : le navigateur simule un survol à chaque toucher,
+// on l'ignore ; les panneaux ouvrent la carte d'un toucher avec open() (elle s'affiche alors en bas d'écran).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isTouchInput } from '../mobile.js';
 
 const SWITCH_DELAY = 120; // passage d'une cible à une autre (laisse le temps de rejoindre la carte)
 const HIDE_DELAY = 280;
@@ -23,7 +26,7 @@ export function useHoverCard() {
   const show = useCallback((key, payload, x, y, opts = {}) => {
     const s = st.current;
     const c = s.card;
-    if (c?.locked) return;
+    if (c?.locked || isTouchInput()) return;
     clearTimeout(s.hideT);
     if (c && c.key === key) {
       if (c.payload !== payload) setCard((p) => (p && p.key === key ? { ...p, payload } : p));
@@ -61,6 +64,13 @@ export function useHoverCard() {
     clearTimers();
     st.current.over = false;
     setCard(null);
+  }, []);
+
+  // ouverture directe, carte bloquée (toucher sur un téléphone)
+  const open = useCallback((key, payload, x = 0, y = 0) => {
+    clearTimers();
+    st.current.over = false;
+    setCard({ key, payload, x, y, dock: null, locked: true });
   }, []);
 
   // Clic en dehors d'une carte bloquée : on la ferme et on « avale » ce clic (mousedown -> mouseup -> click)
@@ -139,7 +149,7 @@ export function useHoverCard() {
     return () => window.removeEventListener('terms:popup-leave', onPopupLeave);
   }, [hide]);
 
-  return { card, show, follow, hide, close, cardProps };
+  return { card, show, open, follow, hide, close, cardProps };
 }
 
 /** Habillage commun : poignée de fermeture + indication « clic pour bloquer » */
@@ -147,10 +157,14 @@ export function CardChrome({ card }) {
   if (!card) return null;
   return card.locked ? (
     <>
-      <button className="card-x" title="Fermer (Échap)" onMouseDown={(e) => e.stopPropagation()} onClick={card.onClose}>
+      <button className="card-x" title="Fermer (Échap)" aria-label="Fermer la carte" onMouseDown={(e) => e.stopPropagation()} onClick={card.onClose}>
         ✕
       </button>
-      <div className="card-hint locked">Carte bloquée · clic sur un mot souligné : sa définition s'ouvre à côté · clic en dehors ou Échap pour fermer</div>
+      <div className="card-hint locked">
+        {isTouchInput()
+          ? 'Touchez un mot souligné pour sa définition · touchez en dehors ou ✕ pour fermer'
+          : "Carte bloquée · clic sur un mot souligné : sa définition s'ouvre à côté · clic en dehors ou Échap pour fermer"}
+      </div>
     </>
   ) : (
     <div className="card-hint">Clic sur la carte : la bloquer · clic sur un mot souligné : sa définition à côté</div>

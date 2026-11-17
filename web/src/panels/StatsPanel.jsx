@@ -3,6 +3,7 @@ import Window from '../components/Window.jsx';
 import { summarizeBuild } from '@core/build-model.mjs';
 import { useLang } from '../lang.jsx';
 import { useTerms } from '../components/Terms.jsx';
+import { pressable } from '../a11y.js';
 
 export default function StatsPanel({ data, build, onClose, setFocusCmd, setHighlight }) {
   // résumé calculé sur les données d'origine, dans la langue choisie (bouton FR / EN de la barre du haut)
@@ -48,7 +49,7 @@ export default function StatsPanel({ data, build, onClose, setFocusCmd, setHighl
         <>
           <div className="section-title">Clés de voûte</div>
           {s.keystones.map((k) => (
-            <div key={k.id} style={{ marginBottom: 6, cursor: 'pointer' }} onClick={() => show(k.id)}>
+            <div key={k.id} style={{ marginBottom: 6, cursor: 'pointer' }} {...pressable(() => show(k.id), { title: "Voir dans l'arbre" })}>
               <div style={{ color: 'var(--gold-2)' }}>{k.name}</div>
               {k.stats.map((t, i) => <div key={i} className="mod small">{link(t, `k${k.id}-${i}`)}</div>)}
             </div>
@@ -59,7 +60,7 @@ export default function StatsPanel({ data, build, onClose, setFocusCmd, setHighl
         <>
           <div className="section-title">Ascendance</div>
           {s.ascendancyNodes.map((k) => (
-            <div key={k.id} style={{ marginBottom: 6, cursor: 'pointer' }} onClick={() => show(k.id)}>
+            <div key={k.id} style={{ marginBottom: 6, cursor: 'pointer' }} {...pressable(() => show(k.id), { title: "Voir dans l'arbre" })}>
               <div style={{ color: 'var(--gold-2)' }}>{k.name}</div>
               {k.stats.map((t, i) => <div key={i} className="mod small">{link(t, `a${k.id}-${i}`)}</div>)}
             </div>
@@ -71,7 +72,7 @@ export default function StatsPanel({ data, build, onClose, setFocusCmd, setHighl
           <div className="section-title">Notables ({s.notables.length})</div>
           <div className="row wrap">
             {s.notables.map((k) => (
-              <span key={k.id} className="tag" style={{ cursor: 'pointer', color: 'var(--text)', borderColor: 'var(--line-2)' }} onClick={() => show(k.id)} title={k.stats.join('\n')}>
+              <span key={k.id} className="tag" style={{ cursor: 'pointer', color: 'var(--text)', borderColor: 'var(--line-2)' }} {...pressable(() => show(k.id), { title: k.stats.join('\n') })}>
                 {k.name}
               </span>
             ))}

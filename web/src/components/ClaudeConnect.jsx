@@ -2,6 +2,7 @@
 // (lien personnel à ajouter comme connecteur dans Claude). Voir web/src/web/claude.js.
 import { useEffect, useState } from 'react';
 import { Modal } from './Window.jsx';
+import { useDialog } from './Dialog.jsx';
 
 let claudeModule = null;
 // uniquement dans la version en ligne (rien de tout cela dans l'interface du serveur local)
@@ -40,8 +41,13 @@ export default function ClaudeButton({ showToast }) {
   const statut = st?.actif ? st.statut : 'arrete';
   return (
     <>
-      <button className="btn small claude-btn" onClick={() => setOpen(true)} title={`${STATUT[statut].texte}. Cliquez pour connecter Claude à vos builds.`}>
-        <span className={`status-dot ${STATUT[statut].point}`} /> ✦ Claude
+      <button
+        className="btn small claude-btn"
+        onClick={() => setOpen(true)}
+        title={`${STATUT[statut].texte}. Cliquez pour connecter Claude à vos builds.`}
+        aria-label={`Claude : ${STATUT[statut].texte}`}
+      >
+        <span className={`status-dot ${STATUT[statut].point}`} aria-hidden="true" /> ✦<span className="tb-label"> Claude</span>
       </button>
       {open && <ClaudeModal st={st} mod={mod} statut={statut} onClose={() => setOpen(false)} showToast={showToast} />}
     </>
@@ -55,8 +61,14 @@ function ClaudeModal({ st, mod, statut, onClose, showToast }) {
       () => showToast(`${quoi} copié !`),
       () => showToast('Copie impossible : sélectionnez le texte et copiez-le à la main.', 'error'),
     );
-  const changerLien = () => {
-    if (!confirm("Créer un nouveau lien ? L'ancien ne fonctionnera plus : il faudra remplacer le connecteur dans Claude.")) return;
+  const dialog = useDialog();
+  const changerLien = async () => {
+    const ok = await dialog.confirm("Créer un nouveau lien ? L'ancien ne fonctionnera plus : il faudra remplacer le connecteur dans Claude.", {
+      title: 'Nouveau lien',
+      okLabel: 'Créer un nouveau lien',
+      danger: true,
+    });
+    if (!ok) return;
     mod.changerLien();
     showToast('Nouveau lien créé : remplacez-le dans les connecteurs de Claude.');
   };

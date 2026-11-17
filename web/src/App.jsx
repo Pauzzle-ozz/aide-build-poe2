@@ -11,8 +11,10 @@ import NotesPanel from './panels/NotesPanel.jsx';
 import LibraryPanel from './panels/LibraryPanel.jsx';
 import HelpPanel from './panels/HelpPanel.jsx';
 import BuildsPanel from './panels/BuildsPanel.jsx';
+import MobileNav from './components/MobileNav.jsx';
 import { TermsProvider } from './components/Terms.jsx';
 import { LangCtx, readLang, saveLang, englishView, labelsFor } from './lang.jsx';
+import { useIsMobile } from './mobile.js';
 
 const PANELS = [
   { id: 'builds', key: 'M', label: 'Mes builds', side: 'center' },
@@ -23,6 +25,7 @@ const PANELS = [
   { id: 'library', key: 'B', label: 'Bibliothèque', side: 'center' },
   { id: 'help', key: '?', label: WEB ? 'Aide' : 'Aide & Claude', side: 'center' },
 ];
+const NO_PANEL = { left: null, right: null, center: null };
 
 /** Version en ligne : messages affichés à l'arrivée (première visite, mémoire du navigateur bloquée) */
 function webNotices(state) {
@@ -40,7 +43,7 @@ function webNotices(state) {
       text: [
         'Vos builds sont enregistrés **dans ce navigateur, sur cet appareil** : ils vous attendent à votre prochaine visite, sans compte à créer.',
         'Commencez dans le **bac à sable** (mode libre), ou créez un build avec le menu en haut à gauche. Le bouton **« ✦ Claude »** (en haut à droite) permet de connecter Claude pour qu\'il crée et modifie vos builds avec vous.',
-        "Pour ne rien perdre, téléchargez de temps en temps une sauvegarde (« Mes builds » → « Télécharger une sauvegarde »). L'aide (touche H) explique le reste.",
+        "Pour ne rien perdre, téléchargez de temps en temps une sauvegarde (« Mes builds » → « Télécharger une sauvegarde »). L'aide (touche H, ou « Menu » → « Aide » sur téléphone) explique le reste.",
       ].join('\n\n'),
     });
   }
@@ -71,6 +74,10 @@ export default function App() {
   const [itemsSlot, setItemsSlot] = useState(null);
   const buildRef = useRef(null);
   buildRef.current = build;
+  // téléphone : un seul panneau à la fois, en plein écran
+  const mobile = useIsMobile();
+  const mobileRef = useRef(mobile);
+  mobileRef.current = mobile;
 
   const showToast = useCallback((text, kind = 'info') => {
     setToast({ text, kind, id: Date.now() });
@@ -109,11 +116,16 @@ export default function App() {
   const openPanel = useCallback((id) => {
     const p = PANELS.find((x) => x.id === id);
     if (!p) return;
-    setPanels((cur) => ({ ...cur, [p.side]: cur[p.side] === id ? null : id, ...(p.side === 'center' ? {} : { center: null }) }));
+    setPanels((cur) => {
+      const next = cur[p.side] === id ? null : id;
+      if (mobileRef.current) return { ...NO_PANEL, [p.side]: next };
+      return { ...cur, [p.side]: next, ...(p.side === 'center' ? {} : { center: null }) };
+    });
   }, []);
   const forcePanel = useCallback((id) => {
     const p = PANELS.find((x) => x.id === id);
     if (!p) return;
+    if (mobileRef.current) return setPanels({ ...NO_PANEL, [p.side]: id });
     setPanels((cur) => ({ ...cur, [p.side]: id, ...(p.side === 'center' ? {} : { center: null }) }));
   }, []);
 
@@ -265,22 +277,31 @@ export default function App() {
           onSetAttribute={(id, attribute) => doOps({ op: 'setAttribute', node: id, attribute })}
         />
         <div className="tree-search">
-          <input className="input" placeholder="Rechercher dans l'arbre (ex : critique, vie, Résolution…)" value={search} onChange={(e) => setSearch(e.target.value)} />
-          {search && <button className="btn small ghost" onClick={() => setSearch('')}>✕</button>}
+          <input
+            className="input"
+            enterKeyHint="search"
+            aria-label="Rechercher dans l'arbre"
+            placeholder={mobile ? 'Rechercher (critique, vie…)' : "Rechercher dans l'arbre (ex : critique, vie, Résolution…)"}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && <button className="btn small ghost" aria-label="Effacer la recherche" onClick={() => setSearch('')}>✕</button>}
           {highlight && <button className="btn small" onClick={() => setHighlight(null)} title="Effacer le surlignage de Claude">Effacer ✦</button>}
         </div>
-        <div className="sidenav">
-          <button className={!panels.left && !panels.right && !panels.center ? 'on' : ''} onClick={() => setPanels({ left: null, right: null, center: null })}>
-            P<span className="tip">Arbre passif (P / Échap)</span>
-          </button>
-          {PANELS.map((p) => (
-            <button key={p.id} className={panels[p.side] === p.id ? 'on' : ''} onClick={() => openPanel(p.id)}>
-              {p.key}
-              <span className="tip">{p.label} ({p.key === '?' ? 'H' : p.key})</span>
+        {!mobile && (
+          <nav className="sidenav" aria-label="Panneaux">
+            <button className={!panels.left && !panels.right && !panels.center ? 'on' : ''} aria-label="Arbre passif" onClick={() => setPanels(NO_PANEL)}>
+              P<span className="tip">Arbre passif (P / Échap)</span>
             </button>
-          ))}
-        </div>
-        <div className="tree-legend">Glisser : déplacer · Molette : zoom · Clic : allouer / retirer · Clic droit (attribut) : changer</div>
+            {PANELS.map((p) => (
+              <button key={p.id} className={panels[p.side] === p.id ? 'on' : ''} aria-label={p.label} onClick={() => openPanel(p.id)}>
+                {p.key}
+                <span className="tip">{p.label} ({p.key === '?' ? 'H' : p.key})</span>
+              </button>
+            ))}
+          </nav>
+        )}
+        {!mobile && <div className="tree-legend">Glisser : déplacer · Molette : zoom · Clic : allouer / retirer · Clic droit (attribut) : changer</div>}
         {panels.left && renderPanel(panels.left)}
         {panels.right && renderPanel(panels.right)}
         {panels.center && renderPanel(panels.center)}
@@ -289,7 +310,7 @@ export default function App() {
             <div key={m.id} className="claude-msg">
               <div className="head">
                 <span>✦ {m.title || 'Claude'}</span>
-                <span className="x" onClick={() => setMessages((l) => l.filter((x) => x.id !== m.id))}>✕</span>
+                <button className="x" aria-label="Fermer le message" onClick={() => setMessages((l) => l.filter((x) => x.id !== m.id))}>✕</button>
               </div>
               <div className="body">
                 <Markdown text={m.text} />
@@ -297,8 +318,15 @@ export default function App() {
             </div>
           ))}
         </div>
-        {toast && <div key={toast.id} className={`toast ${toast.kind}`}>{toast.text}</div>}
+        {toast && <div key={toast.id} className={`toast ${toast.kind}`} role={toast.kind === 'error' ? 'alert' : 'status'}>{toast.text}</div>}
       </div>
+      {mobile && (
+        <MobileNav
+          current={panels.center || panels.left || panels.right}
+          onOpen={forcePanel}
+          onTree={() => setPanels(NO_PANEL)}
+        />
+      )}
     </div>
     </TermsProvider>
     </LangCtx.Provider>

@@ -2,9 +2,10 @@
 // et noms de gemmes / passifs / uniques (infobulle du jeu + lien vers la bibliothèque ou l'arbre).
 // Les deux langues sont reconnues (notes en français, infobulles en anglais avec le bouton FR / EN) ;
 // la définition s'affiche dans la langue choisie, avec le terme dans l'autre langue.
-import { createContext, useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { PassiveTooltip, GemTooltip, ItemTooltip } from './Tooltips.jsx';
 import { useLang } from '../lang.jsx';
+import { isTouchInput } from '../mobile.js';
 
 const Ctx = createContext(null);
 export const TermsCtx = Ctx;
@@ -54,11 +55,16 @@ function buildIndex(data) {
 /**
  * Découpe un texte en morceaux, avec les termes reconnus soulignés.
  * enter / leave : réaction au survol ; click : réaction au clic (les deux peuvent être combinés).
+ * tap : réaction au clic seulement quand elle renvoie true (sinon le clic continue son chemin) — sert au doigt.
  */
-export function makeLinkify(index, { enter, leave, click }) {
+export function makeLinkify(index, { enter, leave, click, tap }) {
   const props = (target) => ({
     ...(enter ? { onMouseEnter: (e) => enter(e, target), onMouseLeave: (e) => leave?.(e, target) } : {}),
-    ...(click ? { onClick: (e) => (e.stopPropagation(), click(target, e)) } : {}),
+    ...(click
+      ? { onClick: (e) => (e.stopPropagation(), click(target, e)) }
+      : tap
+        ? { onClick: (e) => tap(target, e) && e.stopPropagation() }
+        : {}),
   });
   return (text, keyBase = 't') => {
     if (!text) return text;
@@ -115,8 +121,25 @@ export function TermsProvider({ data, children, onLibrary, onNode }) {
       clearTimeout(closeT.current);
       closeT.current = setTimeout(() => setPop(null), 300); // laisse le temps de rejoindre la fenêtre
     };
-    return { linkify: makeLinkify(index, { enter, leave }), enter, leave, index, data, onLibrary, onNode };
+    // au doigt, pas de survol : un toucher sur le mot ouvre sa définition
+    const tap = (target, e) => {
+      if (!isTouchInput()) return false;
+      enter(e, target);
+      return true;
+    };
+    return { linkify: makeLinkify(index, { enter, leave, tap }), enter, leave, index, data, onLibrary, onNode };
   }, [index, data, onLibrary, onNode]);
+
+  // au doigt : toucher en dehors de la fenêtre de définition la ferme
+  useEffect(() => {
+    if (!pop) return;
+    const down = (e) => {
+      if (e.pointerType === 'mouse' || e.target.closest?.('.term-popup, .kw, .ent')) return;
+      setPop(null);
+    };
+    window.addEventListener('pointerdown', down, true);
+    return () => window.removeEventListener('pointerdown', down, true);
+  }, [!!pop]);
 
   const keep = () => clearTimeout(closeT.current);
   const close = () => setPop(null);
@@ -197,6 +220,11 @@ function TermPopup({ pop, data, nested, onEnter, onLeave, go, back, close, onLib
 
   return (
     <div ref={ref} className="term-popup" style={pos} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      {isTouchInput() && (
+        <button className="sheet-close term-close" aria-label="Fermer la définition" onClick={close}>
+          ✕
+        </button>
+      )}
       {pop.stack.length > 0 && (
         <button className="btn small ghost" style={{ marginBottom: 4 }} onClick={back}>
           ← retour

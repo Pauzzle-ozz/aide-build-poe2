@@ -4,7 +4,10 @@ import { api, get, post, WEB } from '../api.js';
 import { Modal } from './Window.jsx';
 import { isSandbox, openSandbox, resetSandbox, saveSandbox, leaveSandbox, SANDBOX_ID } from '../sandbox.js';
 import { useLang } from '../lang.jsx';
+import { useIsMobile } from '../mobile.js';
 import ClaudeButton from './ClaudeConnect.jsx';
+import { useDialog } from './Dialog.jsx';
+import { pressable } from '../a11y.js';
 
 export default function TopBar({ data, build, builds, doOps, showToast, connected, refreshList, switchBuild, setBuild, openPanel }) {
   const { graph } = data;
@@ -16,6 +19,9 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
   const avail = passivePointsForLevel(build.level);
   const maxAsc = data.tree.points?.ascendancy ?? 8;
   const sandbox = isSandbox(build);
+  const mobile = useIsMobile();
+  const dialog = useDialog();
+  const pending = !sandbox && build.pending;
 
   useEffect(() => {
     if (!menu) return;
@@ -28,17 +34,22 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
 
   const changeClass = async (value) => {
     const [cls, asc] = value.split('|');
-    if (cls !== build.class && build.tree.nodes.length && !confirm('Changer de classe retire les passifs qui ne sont plus reliés au point de départ. Continuer ?')) return;
+    if (
+      cls !== build.class &&
+      build.tree.nodes.length &&
+      !(await dialog.confirm('Changer de classe retire les passifs qui ne sont plus reliés au point de départ. Continuer ?', { title: 'Changer de classe', okLabel: 'Changer de classe' }))
+    )
+      return;
     await doOps([{ op: 'setClass', class: cls }, { op: 'setAscendancy', ascendancy: asc || null }]);
   };
 
   const newBuild = async () => {
-    const name = prompt('Nom du nouveau build :', 'Nouveau build');
+    setMenu(false);
+    const name = await dialog.prompt('Nom du nouveau build :', 'Nouveau build', { title: 'Nouveau build', okLabel: 'Créer' });
     if (!name) return;
     const b = await post('/api/builds', { name, class: build.class });
     setBuild(b);
     refreshList();
-    setMenu(false);
   };
   const duplicate = async () => {
     const b = await post(`/api/builds/${build.id}/duplicate`, {});
@@ -47,10 +58,11 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
     setMenu(false);
   };
   const rename = async () => {
-    const name = prompt('Nouveau nom :', build.name);
-    if (name) await doOps({ op: 'rename', name });
-    refreshList();
     setMenu(false);
+    const name = await dialog.prompt('Nouveau nom du build :', build.name, { title: 'Renommer le build', okLabel: 'Renommer' });
+    if (!name || name === build.name) return;
+    await doOps({ op: 'rename', name });
+    refreshList();
   };
   // --- bac à sable
   const enterSandbox = async () => {
@@ -63,18 +75,21 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
     setMenu(false);
     const sb = await get(`/api/builds/${SANDBOX_ID}`).catch(() => null);
     const hasContent = sb && (sb.tree.nodes.length || sb.skills.length || Object.keys(sb.items).length);
-    if (hasContent && !confirm('Le bac à sable contient déjà des essais : les remplacer par une copie de ce build ?')) return;
+    if (hasContent && !(await dialog.confirm('Le bac à sable contient déjà des essais : les remplacer par une copie de ce build ?', { title: 'Bac à sable', okLabel: 'Remplacer', danger: true }))) return;
     setBuild(await openSandbox({ fromBuild: build.id }));
     showToast(`Copie de « ${build.name} » dans le bac à sable : l'original reste intact.`);
   };
   const emptySandbox = async () => {
     setMenu(false);
-    if (!confirm('Vider le bac à sable (arbre, gemmes, équipement, notes) ?')) return;
+    if (!(await dialog.confirm('Vider le bac à sable (arbre, gemmes, équipement, notes) ?', { title: 'Bac à sable', okLabel: 'Vider', danger: true }))) return;
     setBuild(await resetSandbox(build.class));
   };
   const saveAsBuild = async () => {
     setMenu(false);
-    const name = prompt('Nom du nouveau build :', build.copiedFrom ? build.name.replace(/^Bac à sable \(copie de « (.*) »\)$/, '$1 (variante)') : 'Nouveau build');
+    const name = await dialog.prompt('Nom du nouveau build :', build.copiedFrom ? build.name.replace(/^Bac à sable \(copie de « (.*) »\)$/, '$1 (variante)') : 'Nouveau build', {
+      title: 'Enregistrer comme build',
+      okLabel: 'Enregistrer',
+    });
     if (!name) return;
     setBuild(await saveSandbox(name));
     refreshList();
@@ -99,14 +114,22 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
     }
   };
   const discard = async () => {
-    if (!confirm(`Annuler toutes les modifications non validées de « ${build.name} » ? (${(build.pendingChanges || []).join(', ')})`)) return;
+    const ok = await dialog.confirm(`Annuler toutes les modifications non validées de « ${build.name} » ?`, {
+      title: 'Annuler les modifications',
+      detail: `Le build revient à sa dernière version validée. Modifications perdues : ${(build.pendingChanges || []).join(', ') || 'toutes'}.`,
+      okLabel: 'Annuler les modifications',
+      cancelLabel: 'Les garder',
+      danger: true,
+    });
+    if (!ok) return;
     setBuild(await post(`/api/builds/${build.id}/discard`));
     refreshList();
     showToast('Modifications annulées : retour à la version enregistrée.');
   };
 
   const remove = async () => {
-    if (!confirm(`Supprimer définitivement le build « ${build.name} » ?`)) return;
+    setMenu(false);
+    if (!(await dialog.confirm(`Supprimer définitivement le build « ${build.name} » ?`, { title: 'Supprimer le build', okLabel: 'Supprimer', danger: true }))) return;
     const r = await api('DELETE', `/api/builds/${build.id}`);
     setBuild(await get(`/api/builds/${r.activeBuildId}`));
     refreshList();
@@ -115,9 +138,9 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
 
   return (
     <>
-    <div className="topbar">
+    <div className={`topbar ${pending ? 'pending' : ''}`}>
       <div className="brand">
-        Aide Build PoE2
+        <span className="brand-title">Aide Build PoE2</span>
         <button
           className={`sb-toggle ${sandbox ? 'on' : ''}`}
           onClick={sandbox ? exitSandbox : enterSandbox}
@@ -127,13 +150,26 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
         </button>
       </div>
       <div className="sep" />
-      <div style={{ position: 'relative' }} ref={menuRef}>
-        <button className={`btn build-name ${sandbox ? 'sandbox-btn' : ''}`} onClick={() => { if (!menu) refreshList(); setMenu((m) => !m); }} title="Changer / gérer les builds">
-          {sandbox ? 'Bac à sable (aucun build)' : build.name} ▾
+      <div className="tb-build" ref={menuRef}>
+        <button
+          className={`btn build-name ${sandbox ? 'sandbox-btn' : ''}`}
+          onClick={() => { if (!menu) refreshList(); setMenu((m) => !m); }}
+          title="Changer / gérer les builds"
+          aria-haspopup="menu"
+          aria-expanded={menu}
+        >
+          <span className="build-name-text">{sandbox ? 'Bac à sable (aucun build)' : build.name}</span> ▾
         </button>
         {menu && (
           <div className="window build-menu" style={{ left: 0, top: 40, bottom: 'auto' }}>
             <div className="window-body" style={{ padding: 6 }}>
+              {mobile && (
+                <div style={{ padding: '6px 6px 0' }}>
+                  <button className={`sb-toggle big ${sandbox ? 'on' : ''}`} onClick={sandbox ? () => { setMenu(false); exitSandbox(); } : enterSandbox}>
+                    {sandbox ? '✦ Quitter le bac à sable' : '✦ Passer en bac à sable (mode libre)'}
+                  </button>
+                </div>
+              )}
               <div className="row wrap" style={{ padding: 6, gap: 6 }}>
                 <button className="btn small" onClick={() => { openPanel('builds'); setMenu(false); }}>Tous mes builds (M)</button>
                 <button className="btn small" onClick={newBuild}>+ Nouveau</button>
@@ -151,7 +187,7 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
                 const c = graph.classById[b.class];
                 const a = b.ascendancy && graph.ascById[b.ascendancy];
                 return (
-                  <div key={b.id} className={`item ${b.id === build.id ? 'on' : ''}`} onClick={() => { switchBuild(b.id); setMenu(false); }}>
+                  <div key={b.id} className={`item ${b.id === build.id ? 'on' : ''}`} {...pressable(() => { switchBuild(b.id); setMenu(false); }, { 'aria-current': b.id === build.id || undefined })}>
                     <div>{b.name} {b.pending && <span className="tag pending">non validé</span>}</div>
                     <div className="small muted">{a ? a.name : c?.name} · niveau {b.level}</div>
                   </div>
@@ -161,7 +197,8 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
           </div>
         )}
       </div>
-      <select className="input" value={`${build.class}|${build.ascendancy || ''}`} onChange={(e) => changeClass(e.target.value)} title="Classe et ascendance">
+      <div className="topbar-char">
+      <select className="input tb-class" value={`${build.class}|${build.ascendancy || ''}`} onChange={(e) => changeClass(e.target.value)} title="Classe et ascendance" aria-label="Classe et ascendance">
         {graph.classes.map((c) => (
           <optgroup key={c.id} label={c.name}>
             <option value={`${c.id}|`}>{c.name} (sans ascendance)</option>
@@ -171,37 +208,40 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
           </optgroup>
         ))}
       </select>
-      <label className="row small" title="Niveau du personnage">
+      <label className="row small tb-level" title="Niveau du personnage">
         Niv.
-        <input className="input" type="number" min={1} max={100} value={build.level} style={{ width: 62 }} onChange={(e) => doOps({ op: 'setLevel', level: Number(e.target.value) }, { quiet: true })} />
+        <input className="input" type="number" inputMode="numeric" min={1} max={100} value={build.level} aria-label="Niveau du personnage" onChange={(e) => doOps({ op: 'setLevel', level: Number(e.target.value) }, { quiet: true })} />
       </label>
       <div className="points">
         <div className={`pt ${used.passive > avail ? 'over' : ''}`} title={`Points de passif : ${used.passive} utilisés, ${avail} disponibles au niveau ${build.level} (dont ${questPointsForLevel(build.level)} Points de Talent d'Ensemble d'armes, donnés par les quêtes)`}>
-          Passifs <b>{used.passive}</b> / {avail}
+          <span className="m-hide">Passifs</span><span className="m-show">Pts</span> <b>{used.passive}</b> / {avail}
         </div>
         <div className={`pt ${used.ascendancy > maxAsc ? 'over' : ''}`} title="Points d'ascendance (8 au maximum, via les Épreuves)">
           <span className="long">Ascendance</span><span className="short">Asc.</span> <b>{used.ascendancy}</b> / {maxAsc}
         </div>
       </div>
+      </div>
       <div className="grow" />
       {!sandbox && (build.pending ? (
-        <div className="validate-box" title={`Modifications non enregistrées dans le build : ${(build.pendingChanges || []).join(', ') || 'modifications'}. « Valider » les enregistre, « Annuler » revient à la version validée.`}>
-          <span className="pending-dot" />
+        <div className="validate-box tb-status" title={`Modifications non enregistrées dans le build : ${(build.pendingChanges || []).join(', ') || 'modifications'}. « Valider » les enregistre, « Annuler » revient à la version validée.`}>
+          <span className="pending-dot" aria-hidden="true" />
           <span className="small">Non validé : {(build.pendingChanges || []).join(', ') || 'modifications'}</span>
           <button className="btn small validate" onClick={validate}>Valider</button>
           <button className="btn small ghost" onClick={discard}>Annuler</button>
         </div>
       ) : (
-        <div className="small muted" title="Le build enregistré correspond à ce que vous voyez">✓ Build enregistré</div>
+        <div className="small muted tb-status saved" title="Le build enregistré correspond à ce que vous voyez" aria-label="Build enregistré">
+          ✓<span className="tb-label"> Build enregistré</span>
+        </div>
       ))}
-      <div className="lang-toggle" title="Langue des textes du jeu (infobulles, passifs, gemmes, objets, définitions). L'interface de l'outil reste en français.">
-        <button className={lang === 'fr' ? 'on' : ''} onClick={() => setLang('fr')}>FR</button>
-        <button className={lang === 'en' ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
+      <div className="lang-toggle" role="group" aria-label="Langue des textes du jeu" title="Langue des textes du jeu (infobulles, passifs, gemmes, objets, définitions). L'interface de l'outil reste en français.">
+        <button className={lang === 'fr' ? 'on' : ''} aria-pressed={lang === 'fr'} onClick={() => setLang('fr')}>FR</button>
+        <button className={lang === 'en' ? 'on' : ''} aria-pressed={lang === 'en'} onClick={() => setLang('en')}>EN</button>
       </div>
       {WEB && <ClaudeButton showToast={showToast} />}
       {!WEB && (
-        <div className="row small muted" style={{ whiteSpace: 'nowrap' }} title={connected ? 'Synchronisé en temps réel (Claude peut piloter l\'interface)' : 'Connexion au serveur perdue'}>
-          <span className={`status-dot ${connected ? 'on' : ''}`} /> {connected ? 'En direct' : 'Hors ligne'}
+        <div className="row small muted tb-live" style={{ whiteSpace: 'nowrap' }} title={connected ? 'Synchronisé en temps réel (Claude peut piloter l\'interface)' : 'Connexion au serveur perdue'}>
+          <span className={`status-dot ${connected ? 'on' : ''}`} /><span className="tb-label"> {connected ? 'En direct' : 'Hors ligne'}</span>
         </div>
       )}
       {modal === 'import' && <ImportModal onClose={() => setModal(null)} showToast={showToast} setBuild={setBuild} refreshList={refreshList} />}
@@ -210,11 +250,11 @@ export default function TopBar({ data, build, builds, doOps, showToast, connecte
     {sandbox && (
       <div className="sandbox-banner">
         <span className="tag-sb">Bac à sable</span>
-        <span>Mode libre : aucun build n'est sélectionné, vos builds enregistrés ne sont pas modifiés.{build.copiedFrom ? ' Vous travaillez sur une copie.' : ''}</span>
+        <span className="sb-text">Mode libre : aucun build n'est sélectionné, vos builds enregistrés ne sont pas modifiés.{build.copiedFrom ? ' Vous travaillez sur une copie.' : ''}</span>
         <span className="grow" />
-        <button className="btn small" onClick={saveAsBuild}>Enregistrer comme build</button>
+        <button className="btn small" onClick={saveAsBuild}>Enregistrer<span className="m-hide"> comme build</span></button>
         <button className="btn small" onClick={emptySandbox}>Vider</button>
-        <button className="btn small" onClick={exitSandbox}>Quitter le bac à sable</button>
+        <button className="btn small" onClick={exitSandbox}>Quitter<span className="m-hide"> le bac à sable</span></button>
       </div>
     )}
     </>

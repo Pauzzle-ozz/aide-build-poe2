@@ -1,12 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { PassiveTooltip } from './Tooltips.jsx';
 import { useHoverCard } from './HoverCard.jsx';
+import { useIsMobile, isTouchInput } from '../mobile.js';
 
 // Taille des sprites dans le repère de l'arbre (PoB dessine 2 × la taille de texture)
 const NODE_SCALE = 0.62;
 const MIN_S = 0.012;
 const MAX_S = 1.4;
 const CELL = 600;
+const TAP_SLOP = 10; // au-delà de ce déplacement (px), un toucher devient un glissement
+const clampScale = (s) => Math.max(MIN_S, Math.min(MAX_S, s));
+const ATTRS = [
+  ['Strength', 'Force', 'str'],
+  ['Dexterity', 'Dextérité', 'dex'],
+  ['Intelligence', 'Intelligence', 'int'],
+];
 
 const TYPE_OVERLAY = { normal: 'Normal', notable: 'Notable', keystone: 'Keystone', jewel: 'Socket' };
 
@@ -30,6 +38,11 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
   const hc = useHoverCard(); // infobulle du passif survolé (bloquable d'un clic)
   const [attrPick, setAttrPick] = useState(null);
   const [cursor, setCursor] = useState('');
+  // Au doigt : passif touché (fiche en bas d'écran avec « Allouer » / « Retirer »), gestes en cours
+  const [picked, setPicked] = useState(null);
+  const touches = useRef(new Map());
+  const gesture = useRef(null);
+  const mobile = useIsMobile();
 
   // --- Images (atlas + fonds)
   useEffect(() => {
@@ -84,8 +97,10 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
       if (n.name.toLowerCase().includes(q) || n.nameEn.toLowerCase().includes(q) || n.stats.some((s) => s.toLowerCase().includes(q))) searchSet.add(n.id);
     }
   }
-  const hoverPath = hover && !alloc.has(hover.node.id) ? graph.findPath(build, hover.node.id) : null;
-  state.current = { alloc, searchSet, hoverPath: new Set(hoverPath || []), hoverId: hover?.node.id, highlight, build, cls };
+  const pickedNode = picked && tree.nodes[picked.id] === picked ? picked : null;
+  const focusNode = hover?.node || pickedNode; // survolé à la souris, ou touché au doigt
+  const hoverPath = focusNode && !alloc.has(focusNode.id) ? graph.findPath(build, focusNode.id) : null;
+  state.current = { alloc, searchSet, hoverPath: new Set(hoverPath || []), hoverId: focusNode?.id, highlight, build, cls };
   useEffect(() => {
     dirty.current = true;
   });
@@ -117,7 +132,7 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
   }, [focusCmd, tree]);
 
   // --- Centre sur le départ de classe au premier affichage / changement de classe
-  useEffect(() => {
+  function centerView() {
     const c = canvasRef.current;
     if (!c) return;
     const start = cls && tree.nodes[cls.startNode];
@@ -126,8 +141,13 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
     const s = Math.min(W, H) / 7000;
     const x = start ? start.x * 0.6 : 0;
     const y = start ? start.y * 0.6 : 0;
+    anim.current = null;
     view.current = { s, ox: W / 2 - x * s, oy: H / 2 - y * s, init: true };
     dirty.current = true;
+  }
+  useEffect(() => {
+    centerView();
+    setPicked(null);
   }, [build.class, cls, tree]);
 
   // --- Boucle de rendu
@@ -335,7 +355,8 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
     const { s, ox, oy } = view.current;
     return { x: (ev.clientX - r.left - ox) / s, y: (ev.clientY - r.top - oy) / s, sx: ev.clientX - r.left, sy: ev.clientY - r.top };
   }
-  function hitTest(wx, wy) {
+  // minPx : rayon minimal de la zone cliquable, en pixels d'écran (plus large au doigt)
+  function hitTest(wx, wy, minPx = 6) {
     const cx = Math.floor(wx / CELL);
     const cy = Math.floor(wy / CELL);
     let best = null;
@@ -345,7 +366,7 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
         for (const n of vis.current.grid.get(`${cx + dx},${cy + dy}`) || []) {
           const d = Math.hypot(n.x - wx, n.y - wy);
           const r = n.type === 'keystone' ? 140 : n.type === 'notable' || n.type === 'jewel' ? 95 : n.type === 'ascendancyStart' ? 60 : 70;
-          if (d < Math.max(r, 6 / view.current.s) && d < bestD) {
+          if (d < Math.max(r, minPx / view.current.s) && d < bestD) {
             best = n;
             bestD = d;
           }
@@ -355,12 +376,16 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
     return best;
   }
 
+  // --- Souris (ordinateur). Au doigt, ce sont les gestes plus bas qui répondent
+  // (le navigateur simule aussi des évènements souris après un toucher : on les ignore).
   function onMouseDown(ev) {
+    if (isTouchInput()) return;
     if (ev.button !== 0 && ev.button !== 1) return;
     drag.current = { x: ev.clientX, y: ev.clientY, ox: view.current.ox, oy: view.current.oy, moved: false };
     setAttrPick(null);
   }
   function onMouseMove(ev) {
+    if (isTouchInput()) return;
     const d = drag.current;
     if (d) {
       const dx = ev.clientX - d.x;
@@ -389,6 +414,7 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
     }
   }
   function onMouseUp(ev) {
+    if (isTouchInput()) return;
     const d = drag.current;
     drag.current = null;
     setCursor(hover ? 'hovering' : '');
@@ -405,25 +431,30 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
     }
   }
   function onContextMenu(ev) {
-    ev.preventDefault();
+    ev.preventDefault(); // aussi l'appui long au doigt : pas de menu du navigateur sur l'arbre
+    if (isTouchInput()) return;
     const w = toWorld(ev);
     const n = hitTest(w.x, w.y);
     if (n?.isAttribute && state.current.alloc.has(n.id)) setAttrPick({ node: n, x: ev.clientX, y: ev.clientY });
   }
-  function onWheel(ev) {
-    const w = toWorld(ev);
-    const f = Math.pow(1.0015, -ev.deltaY);
-    const s = Math.max(MIN_S, Math.min(MAX_S, view.current.s * f));
-    view.current.ox = w.sx - w.x * s;
-    view.current.oy = w.sy - w.y * s;
-    view.current.s = s;
+  /** Zoom de facteur f autour d'un point de l'écran (sx, sy : coordonnées dans le canevas) */
+  function zoomAround(sx, sy, f) {
+    const v = view.current;
+    const wx = (sx - v.ox) / v.s;
+    const wy = (sy - v.oy) / v.s;
+    const s = clampScale(v.s * f);
+    v.ox = sx - wx * s;
+    v.oy = sy - wy * s;
+    v.s = s;
     dirty.current = true;
   }
+  // Molette (et pincement du pavé tactile) ; écouteurs posés une seule fois
   useEffect(() => {
     const c = canvasRef.current;
     const h = (e) => {
       e.preventDefault();
-      onWheel(e);
+      const r = c.getBoundingClientRect();
+      zoomAround(e.clientX - r.left, e.clientY - r.top, Math.pow(1.0015, -e.deltaY));
     };
     c.addEventListener('wheel', h, { passive: false });
     const ro = new ResizeObserver(() => (dirty.current = true));
@@ -432,7 +463,79 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
       c.removeEventListener('wheel', h);
       ro.disconnect();
     };
-  });
+  }, []);
+
+  // --- Doigts : glisser = se déplacer, pincer = zoomer, toucher un passif = sa fiche (en bas d'écran)
+  function startGesture(moved) {
+    const pts = [...touches.current.values()];
+    const v = view.current;
+    if (pts.length >= 2) {
+      const [a, b] = pts;
+      gesture.current = {
+        mode: 'pinch',
+        d0: Math.max(20, Math.hypot(a.x - b.x, a.y - b.y)),
+        mx: (a.x + b.x) / 2,
+        my: (a.y + b.y) / 2,
+        s0: v.s,
+        ox0: v.ox,
+        oy0: v.oy,
+      };
+    } else if (pts.length === 1) {
+      gesture.current = { mode: 'pan', x: pts[0].x, y: pts[0].y, ox0: v.ox, oy0: v.oy, moved };
+    } else gesture.current = null;
+  }
+  function onPointerDown(ev) {
+    if (ev.pointerType === 'mouse') return;
+    ev.preventDefault();
+    canvasRef.current.setPointerCapture?.(ev.pointerId);
+    touches.current.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    anim.current = null;
+    startGesture(touches.current.size > 1);
+  }
+  function onPointerMove(ev) {
+    if (ev.pointerType === 'mouse' || !touches.current.has(ev.pointerId)) return;
+    touches.current.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    const g = gesture.current;
+    if (!g) return;
+    const v = view.current;
+    if (g.mode === 'pan') {
+      const dx = ev.clientX - g.x;
+      const dy = ev.clientY - g.y;
+      if (!g.moved && Math.hypot(dx, dy) > TAP_SLOP) g.moved = true;
+      if (!g.moved) return;
+      v.ox = g.ox0 + dx;
+      v.oy = g.oy0 + dy;
+    } else {
+      const [a, b] = [...touches.current.values()];
+      const r = canvasRef.current.getBoundingClientRect();
+      const s = clampScale((g.s0 * Math.hypot(a.x - b.x, a.y - b.y)) / g.d0);
+      // le point de l'arbre qui était entre les deux doigts reste entre les deux doigts
+      const wx = (g.mx - r.left - g.ox0) / g.s0;
+      const wy = (g.my - r.top - g.oy0) / g.s0;
+      v.s = s;
+      v.ox = (a.x + b.x) / 2 - r.left - wx * s;
+      v.oy = (a.y + b.y) / 2 - r.top - wy * s;
+    }
+    dirty.current = true;
+  }
+  function onPointerEnd(ev) {
+    if (ev.pointerType === 'mouse' || !touches.current.has(ev.pointerId)) return;
+    const g = gesture.current;
+    touches.current.delete(ev.pointerId);
+    if (ev.type === 'pointerup' && g?.mode === 'pan' && !g.moved && touches.current.size === 0) {
+      const w = toWorld(ev);
+      const n = hitTest(w.x, w.y, 24);
+      setPicked(n && n.type !== 'ascendancyStart' ? n : null);
+    }
+    // un doigt reste posé après un pincement : on continue en déplacement (sans le prendre pour un toucher)
+    startGesture(true);
+  }
+
+  // --- Boutons de zoom (téléphone)
+  const zoomCenter = (f) => {
+    const c = canvasRef.current;
+    zoomAround(c.clientWidth / 2, c.clientHeight / 2, f);
+  };
 
   const pickAttr = (attr) => {
     const p = attrPick;
@@ -450,13 +553,44 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={() => {
+          if (isTouchInput()) return;
           drag.current = null;
           setHover(null);
           setCursor('');
           hc.hide();
         }}
         onContextMenu={onContextMenu}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
       />
+      {mobile && (
+        <div className="tree-zoom" role="group" aria-label="Zoom de l'arbre">
+          <button className="btn" aria-label="Zoomer" onClick={() => zoomCenter(1.5)}>+</button>
+          <button className="btn" aria-label="Dézoomer" onClick={() => zoomCenter(1 / 1.5)}>−</button>
+          <button className="btn" aria-label="Recentrer sur le départ de la classe" onClick={centerView}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="12" r="7" />
+              <circle cx="12" cy="12" r="2" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
+          </button>
+        </div>
+      )}
+      {pickedNode && (
+        <NodeSheet
+          node={pickedNode}
+          graph={graph}
+          build={build}
+          allocated={alloc.has(pickedNode.id)}
+          path={focusNode === pickedNode ? hoverPath : graph.findPath(build, pickedNode.id)}
+          onClose={() => setPicked(null)}
+          onAllocate={onAllocate}
+          onDeallocate={onDeallocate}
+          onSetAttribute={onSetAttribute}
+        />
+      )}
       {hc.card && !attrPick && tree.nodes[hc.card.key] && (() => {
         const cn = tree.nodes[hc.card.key];
         const cPath = alloc.has(cn.id) ? null : cn.id === hover?.node.id ? hoverPath : graph.findPath(build, cn.id);
@@ -483,6 +617,54 @@ export default function TreeView({ tree, graph, sprites, build, onAllocate, onDe
           <button className="btn ghost small" onClick={() => setAttrPick(null)}>✕</button>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Fiche d'un passif touché au doigt : sa carte et les actions (rien n'est alloué sans appui sur un bouton) */
+function NodeSheet({ node, graph, build, allocated, path, onClose, onAllocate, onDeallocate, onSetAttribute }) {
+  const asc = node.ascendancy ? graph.ascById[node.ascendancy] : null;
+  const chosen = build.tree.attributes?.[node.id];
+  const n = path?.length || 1;
+  const pts = `${n} point${n > 1 ? 's' : ''}`;
+  let actions;
+  if (allocated) {
+    actions = (
+      <>
+        {node.isAttribute &&
+          ATTRS.map(([a, label, c]) => (
+            <button key={a} className={`btn ${c} ${chosen === a ? 'active' : ''}`} aria-pressed={chosen === a} onClick={() => onSetAttribute(node.id, a)}>
+              {label}
+            </button>
+          ))}
+        <button className="btn danger" onClick={() => onDeallocate(node.id)}>Retirer</button>
+      </>
+    );
+  } else if (path) {
+    actions = node.isAttribute ? (
+      <>
+        <span className="small muted">Allouer ({pts}) avec :</span>
+        {ATTRS.map(([a, label, c]) => (
+          <button key={a} className={`btn ${c}`} onClick={() => onAllocate(node.id, a)}>{label}</button>
+        ))}
+      </>
+    ) : (
+      <button className="btn validate" onClick={() => onAllocate(node.id)}>Allouer ({pts})</button>
+    );
+  } else {
+    actions = (
+      <span className="small muted">
+        {asc && build.ascendancy !== node.ascendancy ? `Appartient à l'ascendance ${asc.name}` : 'Inaccessible depuis votre arbre actuel'}
+      </span>
+    );
+  }
+  return (
+    <div className="node-sheet" role="dialog" aria-label={node.name}>
+      <button className="sheet-close" aria-label="Fermer la fiche" onClick={onClose}>✕</button>
+      <div className="node-sheet-body">
+        <PassiveTooltip node={node} graph={graph} build={build} floating={false} />
+      </div>
+      <div className="node-sheet-actions">{actions}</div>
     </div>
   );
 }

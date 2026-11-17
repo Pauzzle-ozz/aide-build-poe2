@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useIsMobile } from '../mobile.js';
 
 // Largeur choisie pour chaque panneau de côté (mémorisée dans ce navigateur)
 const storeKey = (id) => `aide-poe2-largeur-${id}`;
@@ -21,9 +22,10 @@ const MIN_W = 320;
 
 export default function Window({ title, side = 'left', wide, onClose, children, tabs, className = '', id }) {
   const ref = useRef(null);
-  const resizable = side === 'left' || side === 'right';
+  const mobile = useIsMobile(); // sur téléphone, les panneaux prennent tout l'écran
+  const resizable = !mobile && (side === 'left' || side === 'right');
   const key = id || title;
-  const [width, setWidth] = useState(() => (resizable ? readWidth(key) : null));
+  const [width, setWidth] = useState(() => (side === 'left' || side === 'right' ? readWidth(key) : null));
 
   // Poignée sur le bord intérieur : glisser pour agrandir / rétrécir, double-clic pour revenir à la taille normale
   const startResize = (e) => {
@@ -68,7 +70,7 @@ export default function Window({ title, side = 'left', wide, onClose, children, 
       <div className="window-title">
         {title}
         {onClose && (
-          <button className="window-close" onClick={onClose} title="Fermer (Échap)">
+          <button className="window-close" onClick={onClose} title="Fermer (Échap)" aria-label="Fermer le panneau">
             ✕
           </button>
         )}
@@ -85,7 +87,7 @@ export function Modal({ title, onClose, children }) {
       <div className="window modal" onMouseDown={(e) => e.stopPropagation()}>
         <div className="window-title">
           {title}
-          <button className="window-close" onClick={onClose}>✕</button>
+          <button className="window-close" onClick={onClose} aria-label="Fermer">✕</button>
         </div>
         <div className="window-body">{children}</div>
       </div>
