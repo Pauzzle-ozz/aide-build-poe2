@@ -61,6 +61,20 @@ function parseKeywords(html) {
   return out;
 }
 
+// Abréviations internes du jeu (définition « [DNT] Str ») : le mot est souligné en jeu mais n'a pas de définition
+// propre ; on le renvoie au terme complet (« Force » -> Force, « Dex » -> Dextérité, « Force/Dex » -> Attributs).
+const PLACEHOLDER_ALIASES = {
+  Str: 'Strength',
+  Dex: 'Dexterity',
+  Int: 'Intelligence',
+  Str_Dex: 'Attributes',
+  Str_Int: 'Attributes',
+  Dex_Int: 'Attributes',
+  Str_Dex_Int: 'Attributes',
+  'Two-Hander': 'Two-Handed',
+};
+const isPlaceholder = (d) => /^\s*\[?DNT\b/.test(d || '');
+
 export async function buildGlossary() {
   const entries = parseKeywords(await fetchText(KEYWORDS_URL));
   // version anglaise officielle (bouton FR / EN de l'interface, recherche « shock » -> Électrocution)
@@ -73,10 +87,30 @@ export async function buildGlossary() {
     console.warn(`  ! glossaire anglais indisponible : ${e.message}`);
   }
 
+  // entrées sans vraie définition : retirées, leurs formes (« dex », « force/int »…) renvoient au terme complet
+  const alias = new Map();
+  const aliasTitles = [];
+  for (const [slug, e] of Object.entries(entries)) {
+    if (!isPlaceholder(e.d)) continue;
+    delete entries[slug];
+    const to = PLACEHOLDER_ALIASES[slug];
+    if (!to) continue;
+    alias.set(slug, to);
+    aliasTitles.push([to, e]);
+  }
+  for (const [slug, to] of alias) if (!entries[to]) alias.delete(slug);
+  const resolve = (slug) => alias.get(slug) || slug;
+  const relink = (d) => d && d.replace(/data-k="([^"]+)"/g, (m, k) => (alias.has(k) ? `data-k="${alias.get(k)}"` : m));
+  for (const e of Object.values(entries)) {
+    e.d = relink(e.d);
+    if (e.dEn) e.dEn = relink(e.dEn);
+  }
+
   // Formes : toutes les ancres « KeywordPopups » des pages poe2db en cache, séparées par langue
   // (une page anglaise a un fichier « .url » contenant /us/ ; les autres pages du cache sont en français)
   const counts = { fr: new Map(), en: new Map() }; // forme -> Map(slug -> n)
-  const add = (lang, form, slug) => {
+  const add = (lang, form, rawSlug) => {
+    const slug = resolve(rawSlug);
     const f = form.trim().toLowerCase();
     if (f.length < 3 || /^\d/.test(f) || SKIP_FORMS.has(f) || !entries[slug]) return;
     const c = counts[lang];
@@ -84,7 +118,7 @@ export async function buildGlossary() {
     const m = c.get(f);
     m.set(slug, (m.get(slug) || 0) + 1);
   };
-  for (const [slug, e] of Object.entries(entries)) {
+  for (const [slug, e] of [...Object.entries(entries), ...aliasTitles]) {
     for (let i = 0; i < 3; i++) {
       add('fr', e.t, slug);
       if (e.tEn) add('en', e.tEn, slug);
